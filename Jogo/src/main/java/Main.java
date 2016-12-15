@@ -19,7 +19,8 @@ public class Main {
 
     // The window handle
     private long window;
-
+    private float rotate = 1;
+    private float down = 0;
     public void run() {
         System.out.println("Hello LWJGL " + Version.getVersion() + "!");
 
@@ -52,8 +53,8 @@ public class Main {
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
         glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
 
-        int WIDTH = 300;
-        int HEIGHT = 300;
+        int WIDTH = 600;
+        int HEIGHT = 600;
 
         // Create the window
         window = glfwCreateWindow(WIDTH, HEIGHT, "Hello World!", NULL, NULL);
@@ -85,7 +86,39 @@ public class Main {
         // Make the window visible
         glfwShowWindow(window);
     }
-
+    private void drawPolygon() {
+            
+            glPushMatrix();
+            glColor3f(0.0f,0.0f,1.0f);
+            glTranslatef(0, -0.1f, 0.0f);
+            glRotated( rotate , 0.0, 0.0, 1.0 );     
+            glBegin(GL_POLYGON);
+            glColor3f(1.0f,0.0f,1.0f);
+            glVertex2f(-0.3f,-0.3f);
+            glColor3f(1.0f,0.0f,1.0f);
+            glVertex2f(0.3f,-0.3f);
+            glColor3f(0.0f,0.0f,1.0f);
+            glVertex2f(0.3f,0.3f);
+            glVertex2f(-0.3f,0.3f);
+            glEnd();
+            rotate += 0.5;
+            glPopMatrix();
+    }
+    private void drawCursor(){
+            glPushMatrix();
+            glColor3f(0.0f,1.0f,0.0f);
+            glTranslatef(0, down, 0.0f);
+            glBegin(GL_POLYGON);
+            glVertex2f(-0.1f,1);
+            glVertex2f(0.1f,1);
+            glVertex2f(0f,0.8f);
+            glEnd();
+            glPopMatrix();
+            down -= 0.05;
+            if(down < -1){
+                down = 0;
+            }
+    }
     private void loop() {
         // This line is critical for LWJGL's interoperation with GLFW's
         // OpenGL context, or any context that is managed externally.
@@ -93,15 +126,17 @@ public class Main {
         // creates the GLCapabilities instance and makes the OpenGL
         // bindings available for use.
         GL.createCapabilities();
-
+        
         // Set the clear color
-        glClearColor(1.0f, 0.0f, 0.0f, 0.0f);
-
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
         while (!glfwWindowShouldClose(window)) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-
+           
+            drawPolygon();
+            drawCursor();
             glfwSwapBuffers(window); // swap the color buffers
 
             // Poll for window events. The key callback above will only be
