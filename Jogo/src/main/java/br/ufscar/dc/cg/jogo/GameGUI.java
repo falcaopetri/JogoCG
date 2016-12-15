@@ -32,6 +32,7 @@ public class GameGUI {
     private long lastShotTime = 0L;
     private float rotate = 1;
     private float down = 0;
+    private boolean shot = false;
 
     private GLCapabilities caps;
     /*
@@ -116,7 +117,7 @@ public class GameGUI {
         GL.createCapabilities();
 
         // Set the clear color
-        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+        glClearColor(0.7f, 0.7f, 0.9f, 0.0f);
 
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
@@ -144,6 +145,8 @@ public class GameGUI {
             game.do_move();
             System.out.println("shot executed");
             lastShotTime = thisTime;
+            shot = true;
+                 
         }
     }
 
@@ -175,21 +178,33 @@ public class GameGUI {
     }
 
     private void drawPolygon() {
-
+        
+        
+        Polygon pol = new Polygon(3);
+        
         glPushMatrix();
-        glColor3f(0.0f, 0.0f, 1.0f);
         glTranslatef(0, -0.1f, 0.0f);
         glRotated(rotate, 0.0, 0.0, 1.0);
         glBegin(GL_POLYGON);
-        glColor3f(1.0f, 0.0f, 1.0f);
-        glVertex2f(-0.3f, -0.3f);
-        glColor3f(1.0f, 0.0f, 1.0f);
-        glVertex2f(0.3f, -0.3f);
-        glColor3f(0.0f, 0.0f, 1.0f);
-        glVertex2f(0.3f, 0.3f);
-        glVertex2f(-0.3f, 0.3f);
+        pol._poly.addPoint(-3, -3);
+        pol._poly.addPoint(3, -3);
+        pol._poly.addPoint(3, 3);
+        pol._poly.addPoint(-3, 3);
+        for(int i =0;i< pol._poly.npoints;i++){
+            glColor3f(0.0f, 0.0f, 1.0f);
+             float x = pol._poly.xpoints[i]*1.0f/10;
+             float y = pol._poly.ypoints[i]*1.0f/10;
+            glVertex2f(x, y);
+        }
+        //glColor3f(1.0f, 0.0f, 1.0f);
+        //glVertex2f(-0.3f, -0.3f);
+        //glColor3f(1.0f, 0.0f, 1.0f);
+        //glVertex2f(0.3f, -0.3f);
+        //glColor3f(0.0f, 0.0f, 1.0f);
+        //glVertex2f(0.3f, 0.3f);
+        //glVertex2f(-0.3f, 0.3f);
         glEnd();
-        rotate += 0.5;
+        rotate += 0.7;
         glPopMatrix();
     }
 
@@ -203,8 +218,11 @@ public class GameGUI {
         glVertex2f(0f, 0.8f);
         glEnd();
         glPopMatrix();
-        down -= 0.05;
-        if (down < -1) {
+        if (shot ) {
+            down -= 0.05;
+            if(down < -1) shot = false; // trocar para colide
+        }
+        else{
             down = 0;
         }
     }
