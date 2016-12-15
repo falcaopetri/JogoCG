@@ -1,11 +1,13 @@
 package br.ufscar.dc.cg.jogo;
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import org.lwjgl.BufferUtils;
 import static org.lwjgl.glfw.GLFW.*;
 import org.lwjgl.glfw.*;
-import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import org.lwjgl.opengl.GL;
 import static org.lwjgl.opengl.GL11.*;
 import org.lwjgl.opengl.GLCapabilities;
@@ -18,6 +20,7 @@ import static org.lwjgl.system.MemoryUtil.*;
 public class GameGUI {
 
     private Game game;
+    private Polygon arrow;
 
     private long window;
     private static int WIDTH = 600;
@@ -34,7 +37,6 @@ public class GameGUI {
     private float down = 0;
     private boolean shot = false;
 
-    private GLCapabilities caps;
     /*
         Callbacks
      */
@@ -45,6 +47,11 @@ public class GameGUI {
         if (!glfwInit()) {
             throw new IllegalStateException("Unable to initialize GLFW");
         }
+
+        arrow = new Polygon(3);
+        arrow.add(-0.1f, 1f);
+        arrow.add(0.1f, 1f);
+        arrow.add(0.0f, 0.8f);
 
         // Configure our window
         glfwDefaultWindowHints(); // optional, the current window hints are already the default
@@ -72,18 +79,9 @@ public class GameGUI {
                 }
             }
         });
-        
-        glfwMakeContextCurrent(window);
-        glfwSwapInterval(0);
-        glfwShowWindow(window);
 
         IntBuffer framebufferSize = BufferUtils.createIntBuffer(2);
         nglfwGetFramebufferSize(window, memAddress(framebufferSize), memAddress(framebufferSize) + 4);
-
-        caps = GL.createCapabilities();
-        if (!caps.OpenGL20) {
-            throw new AssertionError("This demo requires OpenGL 2.0.");
-        }
 
         // Setup an error callback. The default implementation
         // will print the error message in System.err.
@@ -151,7 +149,7 @@ public class GameGUI {
     }
 
     private void updateControls() {
-         spaceKeyDown = keyDown[GLFW_KEY_SPACE];
+        spaceKeyDown = keyDown[GLFW_KEY_SPACE];
     }
 
     private void render() {
@@ -180,31 +178,20 @@ public class GameGUI {
     private void drawPolygon() {
         
         
-        Polygon pol = new Polygon(3);
+        Polygon pol = Polygon.generate(3);
         
         glPushMatrix();
         glTranslatef(0, -0.1f, 0.0f);
         glRotated(rotate, 0.0, 0.0, 1.0);
         glBegin(GL_POLYGON);
-        pol._poly.addPoint(-3, -3);
-        pol._poly.addPoint(3, -3);
-        pol._poly.addPoint(3, 3);
-        pol._poly.addPoint(-3, 3);
-        for(int i =0;i< pol._poly.npoints;i++){
+        for(Point i : pol._poly){
             glColor3f(0.0f, 0.0f, 1.0f);
-             float x = pol._poly.xpoints[i]*1.0f/10;
-             float y = pol._poly.ypoints[i]*1.0f/10;
-            glVertex2f(x, y);
+            glVertex2f(i.getX(), i.getY());
         }
-        //glColor3f(1.0f, 0.0f, 1.0f);
-        //glVertex2f(-0.3f, -0.3f);
-        //glColor3f(1.0f, 0.0f, 1.0f);
-        //glVertex2f(0.3f, -0.3f);
-        //glColor3f(0.0f, 0.0f, 1.0f);
-        //glVertex2f(0.3f, 0.3f);
-        //glVertex2f(-0.3f, 0.3f);
+        
         glEnd();
         rotate += 0.7;
+        System.out.println(rotate);
         glPopMatrix();
     }
 
@@ -213,12 +200,12 @@ public class GameGUI {
         glColor3f(0.0f, 1.0f, 0.0f);
         glTranslatef(0, down, 0.0f);
         glBegin(GL_POLYGON);
-        glVertex2f(-0.1f, 1);
-        glVertex2f(0.1f, 1);
-        glVertex2f(0f, 0.8f);
+        for(Point i : arrow._poly){
+            glVertex2f(i.getX(), i.getY());
+        }
         glEnd();
         glPopMatrix();
-        if (shot ) {
+        if (shot) {
             down -= 0.05;
             if(down < -1) shot = false; // trocar para colide
         }
