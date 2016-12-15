@@ -1,11 +1,13 @@
 package br.ufscar.dc.cg.jogo;
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import org.lwjgl.BufferUtils;
 import static org.lwjgl.glfw.GLFW.*;
 import org.lwjgl.glfw.*;
-import static org.lwjgl.glfw.Callbacks.glfwFreeCallbacks;
 import org.lwjgl.opengl.GL;
 import static org.lwjgl.opengl.GL11.*;
 import org.lwjgl.opengl.GLCapabilities;
@@ -18,6 +20,7 @@ import static org.lwjgl.system.MemoryUtil.*;
 public class GameGUI {
 
     private Game game;
+    private Polygon arrow;
 
     private long window;
     private static int WIDTH = 600;
@@ -33,7 +36,6 @@ public class GameGUI {
     private float rotate = 1;
     private float down = 0;
 
-    private GLCapabilities caps;
     /*
         Callbacks
      */
@@ -44,6 +46,11 @@ public class GameGUI {
         if (!glfwInit()) {
             throw new IllegalStateException("Unable to initialize GLFW");
         }
+
+        arrow = new Polygon(3);
+        arrow.add(-0.1f, 1f);
+        arrow.add(0.1f, 1f);
+        arrow.add(0.0f, 0.8f);
 
         // Configure our window
         glfwDefaultWindowHints(); // optional, the current window hints are already the default
@@ -71,18 +78,9 @@ public class GameGUI {
                 }
             }
         });
-        
-        glfwMakeContextCurrent(window);
-        glfwSwapInterval(0);
-        glfwShowWindow(window);
 
         IntBuffer framebufferSize = BufferUtils.createIntBuffer(2);
         nglfwGetFramebufferSize(window, memAddress(framebufferSize), memAddress(framebufferSize) + 4);
-
-        caps = GL.createCapabilities();
-        if (!caps.OpenGL20) {
-            throw new AssertionError("This demo requires OpenGL 2.0.");
-        }
 
         // Setup an error callback. The default implementation
         // will print the error message in System.err.
@@ -148,7 +146,7 @@ public class GameGUI {
     }
 
     private void updateControls() {
-         spaceKeyDown = keyDown[GLFW_KEY_SPACE];
+        spaceKeyDown = keyDown[GLFW_KEY_SPACE];
     }
 
     private void render() {
@@ -175,7 +173,6 @@ public class GameGUI {
     }
 
     private void drawPolygon() {
-
         glPushMatrix();
         glColor3f(0.0f, 0.0f, 1.0f);
         glTranslatef(0, -0.1f, 0.0f);
