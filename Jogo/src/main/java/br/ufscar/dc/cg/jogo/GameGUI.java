@@ -3,6 +3,8 @@ package br.ufscar.dc.cg.jogo;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import org.lwjgl.BufferUtils;
@@ -36,6 +38,11 @@ public class GameGUI {
     private float rotate = 1;
     private float down = 0;
     private boolean shot = false;
+    private boolean paint = false;
+    /*testeeeeeeeeeee
+     */
+    private float corR[] = new float[8];
+    private int ite;
 
     /*
         Callbacks
@@ -43,7 +50,15 @@ public class GameGUI {
     private GLFWKeyCallback keyCallback;
 
     private void init() throws IOException {
-
+        corR[0] = 0.0f;
+        corR[1] = 0.0f;
+        corR[2] = 0.0f;
+        corR[3] = 0.0f;
+        corR[4] = 0.0f;
+        corR[5] = 0.0f;
+        corR[6] = 0.0f;
+        corR[7] = 0.0f;
+        ite = 0;
         if (!glfwInit()) {
             throw new IllegalStateException("Unable to initialize GLFW");
         }
@@ -115,7 +130,7 @@ public class GameGUI {
         GL.createCapabilities();
 
         // Set the clear color
-        glClearColor(0.7f, 0.7f, 0.9f, 0.0f);
+        glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 
         // Run the rendering loop until the user has attempted to close
         // the window or has pressed the ESCAPE key.
@@ -144,7 +159,8 @@ public class GameGUI {
             System.out.println("shot executed");
             lastShotTime = thisTime;
             shot = true;
-                 
+            paint = true;
+
         }
     }
 
@@ -176,23 +192,68 @@ public class GameGUI {
     }
 
     private void drawPolygon() {
-        
-        
-        Polygon pol = Polygon.generate(3);
-        
+
+        Polygon pol = Polygon.generate(4);
+
+        ite++;
+        if (ite == 4) {
+            ite = 0;
+        }
+        //System.out.println(ite);
+        double maior = -2;
+        int mi = 0;
         glPushMatrix();
         glTranslatef(0, -0.1f, 0.0f);
         glRotated(rotate, 0.0, 0.0, 1.0);
         glBegin(GL_POLYGON);
-        for(Point i : pol._poly){
-            glColor3f(0.0f, 0.0f, 1.0f);
-            glVertex2f(i.getX(), i.getY());
+        for (int i = 0; i < pol._poly.size(); i++) {
+            Point p = pol._poly.get(i);
+            glColor3f(corR[i], 0.0f, 1.0f);
+            glVertex2f(p.getX(), p.getY());
+            //System.out.println(ite);
+            
+                double ny = rotationY(p.getX(), p.getY(), rotate);
+                if (maior <= ny) {
+                    maior = ny;
+                    double nx = rotationX(p.getX(),p.getY(),rotate);
+                    if(nx > 0.8)
+                    mi = i-1;
+                    else
+                    mi = i;
+                    
+                    if(mi < 0 )mi = pol._poly.size();
+                }
+            
         }
-        
+
+        if (paint) {
+            //double nx = rotationX(i.getX(),i.getY(),rotate);
+            //double ny = rotationY(i.getX(),i.getY(),rotate);
+            //pol._edges_states.set(ite, true);               
+            corR[mi] = 0.7f;
+            //corR[(ite + 1) % 4] = 0.7f;
+            //System.out.println(mi);
+            paint = false;
+        }
         glEnd();
         rotate += 0.7;
-        System.out.println(rotate);
+        if (rotate == 360) {
+            rotate = 0;
+        }
+
         glPopMatrix();
+    }
+
+    private double rotationX(float x, float y, double ang) {
+        double rad = ang*Math.PI/180;
+        double nx = cos(rad) * x + sin(rad) * -1 * y;
+        return nx;
+    }
+
+    private double rotationY(float x, float y, double ang) {
+        double rad = ang*Math.PI/180;
+        double ny = sin(rad) * x + cos(rad) * y;
+        return ny;
     }
 
     private void drawCursor() {
@@ -200,16 +261,17 @@ public class GameGUI {
         glColor3f(0.0f, 1.0f, 0.0f);
         glTranslatef(0, down, 0.0f);
         glBegin(GL_POLYGON);
-        for(Point i : arrow._poly){
+        for (Point i : arrow._poly) {
             glVertex2f(i.getX(), i.getY());
         }
         glEnd();
         glPopMatrix();
         if (shot) {
-            down -= 0.05;
-            if(down < -1) shot = false; // trocar para colide
-        }
-        else{
+            down -= 0.5;
+            if (down < -1) {
+                shot = false; // trocar para colide
+            }
+        } else {
             down = 0;
         }
     }

@@ -20,8 +20,8 @@ class Polygon {
 
     public static Polygon generate(int n) {
         // TODO generate a random Polygon
-        float x[] = new float[]{-0.3f, 0.3f, 0.3f};
-        float y[] = new float[]{-0.3f, -0.3f, 0.3f};
+        float x[] = new float[]{-0.3f,-0.301f, 0.3f,0.301f, 0.3f,0.301f, -0.3f,-0.301f};
+        float y[] = new float[]{-0.3f,-0.301f, 0.3f,0.301f, 0.3f,0.301f, -0.3f,-0.301f};
 
         return Polygon.create(x, y);
     }
