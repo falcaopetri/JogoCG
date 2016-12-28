@@ -1,16 +1,12 @@
 package br.ufscar.dc.cg.jogo;
 
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import org.lwjgl.BufferUtils;
 import static org.lwjgl.glfw.GLFW.*;
 import org.lwjgl.glfw.*;
 import org.lwjgl.opengl.GL;
 import static org.lwjgl.opengl.GL11.*;
-import org.lwjgl.opengl.GLCapabilities;
 import static org.lwjgl.system.MemoryUtil.*;
 
 /**
@@ -48,7 +44,7 @@ public class GameGUI {
             throw new IllegalStateException("Unable to initialize GLFW");
         }
 
-        arrow = new Polygon(3);
+        arrow = new Polygon();
         arrow.add(-0.1f, 1f);
         arrow.add(0.1f, 1f);
         arrow.add(0.0f, 0.8f);
@@ -71,6 +67,9 @@ public class GameGUI {
                 }
                 if (key == GLFW_KEY_ESCAPE && action == GLFW_RELEASE) {
                     glfwSetWindowShouldClose(window, true);
+                }
+                if (key == GLFW_KEY_N && action == GLFW_RELEASE) {
+                    game.next_level();
                 }
                 if (action == GLFW_PRESS/*|| action == GLFW_REPEAT*/) {
                     keyDown[key] = true;
@@ -144,7 +143,7 @@ public class GameGUI {
             System.out.println("shot executed");
             lastShotTime = thisTime;
             shot = true;
-                 
+
         }
     }
 
@@ -176,22 +175,22 @@ public class GameGUI {
     }
 
     private void drawPolygon() {
-        
-        
-        Polygon pol = Polygon.generate(3);
-        
+
+        Polygon pol = game.getPolygon();
+        System.out.println("p: " + pol._poly.size());
+        // TODO aplicar translação de acordo com pol.getGravityCenter()
         glPushMatrix();
         glTranslatef(0, -0.1f, 0.0f);
         glRotated(rotate, 0.0, 0.0, 1.0);
         glBegin(GL_POLYGON);
-        for(Point i : pol._poly){
+        for (Point i : pol._poly) {
             glColor3f(0.0f, 0.0f, 1.0f);
             glVertex2f(i.getX(), i.getY());
         }
-        
+
         glEnd();
         rotate += 0.7;
-        System.out.println(rotate);
+        //System.out.println(rotate);
         glPopMatrix();
     }
 
@@ -200,16 +199,17 @@ public class GameGUI {
         glColor3f(0.0f, 1.0f, 0.0f);
         glTranslatef(0, down, 0.0f);
         glBegin(GL_POLYGON);
-        for(Point i : arrow._poly){
+        for (Point i : arrow._poly) {
             glVertex2f(i.getX(), i.getY());
         }
         glEnd();
         glPopMatrix();
         if (shot) {
             down -= 0.05;
-            if(down < -1) shot = false; // trocar para colide
-        }
-        else{
+            if (down < -1) {
+                shot = false; // trocar para colide
+            }
+        } else {
             down = 0;
         }
     }
