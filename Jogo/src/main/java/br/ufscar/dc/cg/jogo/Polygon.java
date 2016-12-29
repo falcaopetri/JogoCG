@@ -133,6 +133,9 @@ public class Polygon {
         poly = new Polygon();
         for (Point p : ch.points) {
             poly.add(p);
+            // TODO duplica vértices
+            //Point p_dup = new Point(p.getX() + 0.001f, p.getY() + 0.001f);
+            //poly.add(p_dup);
         }
         return poly;
     }
@@ -285,7 +288,11 @@ public class Polygon {
     private void calculate_gravity_center() {
         // TODO calcula o centro de massa dos pontos, e não do polígono em si
         // read: https://en.wikipedia.org/wiki/Centroid#Centroid_of_polygon
-        
+        // _gravity_center =  calculate_gravity_center_mean();
+        _gravity_center = calculate_gravity_center_centroid();
+    }
+
+    private Point calculate_gravity_center_mean() {
         float x_sum = 0;
         float y_sum = 0;
 
@@ -294,6 +301,28 @@ public class Polygon {
             y_sum += p.getY();
         }
 
-        _gravity_center = new Point(x_sum / this.size(), y_sum / this.size());
+        return new Point(x_sum / this.size(), y_sum / this.size());
+    }
+
+    private Point calculate_gravity_center_centroid() {
+        float twicearea = 0;
+        float x = 0;
+        float y = 0;
+        Point p1, p2;
+        float f;
+        Point off = _poly.get(0);
+        for (int i = 0, j = _poly.size() - 1; i < _poly.size(); j = i++) {
+            p1 = _poly.get(i);
+            p2 = _poly.get(j);
+            f = (p1.getX() - off.getX()) * (p2.getY() - off.getY()) - (p2.getX() - off.getX()) * (p1.getY() - off.getY());
+            twicearea += f;
+            x += (p1.getX() + p2.getX() - 2 * off.getX()) * f;
+            y += (p1.getY() + p2.getY() - 2 * off.getY()) * f;
+        }
+
+        f = twicearea * 3;
+
+        return new Point(x / f + off.getX(), y / f + off.getY());
+
     }
 }

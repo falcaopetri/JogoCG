@@ -234,6 +234,7 @@ public class GameGUI {
             //double ny = rotationY(i.getX(),i.getY(),rotate);
             //pol._edges_states.set(ite, true);               
             corR[mi] = 0.7f;
+            corR[(mi + 1) % pol._poly.size()] = 0.7f;
             //corR[(ite + 1) % 4] = 0.7f;
             //System.out.println(mi);
             paint = false;
