@@ -133,8 +133,9 @@ public class Polygon {
         poly = new Polygon();
         for (Point p : ch.points) {
             poly.add(p);
+           
             // TODO duplica vértices
-            //Point p_dup = new Point(p.getX() + 0.001f, p.getY() + 0.001f);
+            //Point p_dup = new Point(p.getX()+ 0.01f*p.getX() , p.getY()+ 0.01f*p.getY());
             //poly.add(p_dup);
         }
         return poly;
@@ -221,6 +222,7 @@ public class Polygon {
 
         for (int i = 0; i < x.length; ++i) {
             p.add(x[i], y[i]);
+            
         }
 
         return p;
@@ -228,6 +230,7 @@ public class Polygon {
 
     public void add(float x, float y) {
         add(new Point(x, y));
+        
     }
 
     public void add(Point p) {

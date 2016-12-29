@@ -20,7 +20,7 @@ public class GameGUI {
 
     private Game game;
     private Polygon arrow;
-
+    
     private long window;
     private static int WIDTH = 600;
     private static int HEIGHT = 600;
@@ -39,8 +39,10 @@ public class GameGUI {
     /*testeeeeeeeeeee
      */
     // TODO corR deve ser do tamanho do polígono, ou seja, atualizado constantemente
-    private float corR[] = new float[8];
+  
     private int ite;
+    private double disparo;
+    private double colide;
 
     /*
         Callbacks
@@ -48,14 +50,7 @@ public class GameGUI {
     private GLFWKeyCallback keyCallback;
 
     private void init() throws IOException {
-        corR[0] = 0.0f;
-        corR[1] = 0.0f;
-        corR[2] = 0.0f;
-        corR[3] = 0.0f;
-        corR[4] = 0.0f;
-        corR[5] = 0.0f;
-        corR[6] = 0.0f;
-        corR[7] = 0.0f;
+
         ite = 0;
         if (!glfwInit()) {
             throw new IllegalStateException("Unable to initialize GLFW");
@@ -65,7 +60,7 @@ public class GameGUI {
         arrow.add(-0.1f, 1f);
         arrow.add(0.1f, 1f);
         arrow.add(0.0f, 0.8f);
-
+        game.attCorR();
         // Configure our window
         glfwDefaultWindowHints(); // optional, the current window hints are already the default
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
@@ -193,8 +188,8 @@ public class GameGUI {
 
     private void drawPolygon() {
         Polygon pol = game.getPolygon();
-        System.out.println("p: " + pol._poly.size());
-
+        //System.out.println("p: " + pol._poly.size());
+        boolean passou = false;
         ite = (ite + 1) % pol._poly.size();
 
         //System.out.println(ite);
@@ -208,14 +203,25 @@ public class GameGUI {
         //System.out.println(rotate);
         for (int i = 0; i < pol._poly.size(); i++) {
             Point p = pol._poly.get(i);
-            glColor3f(corR[i], 0.0f, 1.0f);
+            glColor3f((float) game.corR.get(i), 0.0f, 1.0f);
             glVertex2f(p.getX(), p.getY());
             //System.out.println(ite);
 
-            double ny = rotationY(p.getX(), p.getY(), rotate);
+            double ny = rotationY(p.getX(), p.getY(), rotate+10);
+            if(disparo == maior){
+                colide = disparo;
+                colide += ny;
+                colide /= 2;
+                colide = 1 - Math.abs(colide);
+                colide *=-1;
+                if(colide > -0.5) colide = -0.5;
+                
+              
+            }
             if (maior <= ny) {
                 maior = ny;
-                double nx = rotationX(p.getX(), p.getY(), rotate);
+                double nx = rotationX(p.getX(), p.getY(), rotate+10);
+                disparo = maior;// - Math.abs(nx)/2.0;
                 if (nx > 0.8) {
                     mi = i - 1;
                 } else {
@@ -230,14 +236,33 @@ public class GameGUI {
         }
 
         if (paint) {
+            
             //double nx = rotationX(i.getX(),i.getY(),rotate);
             //double ny = rotationY(i.getX(),i.getY(),rotate);
             //pol._edges_states.set(ite, true);               
-            corR[mi] = 0.7f;
-            corR[(mi + 1) % pol._poly.size()] = 0.7f;
+            game.corR.set(mi, 0.7f);
+            game.corR.set((mi) % pol._poly.size()+1, 0.7f);
             //corR[(ite + 1) % 4] = 0.7f;
             //System.out.println(mi);
             paint = false;
+            //game.next_level();
+        }
+        for (int i=0; i < pol._poly.size();i++){
+            passou = true;
+           // System.out.println(game.corR.get(i));
+            if(game.corR.get(i) == 0) {   
+               //System.out.println(game.corR.get(i));
+                passou = false;
+                //System.out.println(passou);
+                break;
+            }
+            
+            
+        }
+        if(passou){
+            game.next_level();
+            game.attCorR();
+            
         }
         glEnd();
         rotate += 0.7;
@@ -269,9 +294,15 @@ public class GameGUI {
         glEnd();
         glPopMatrix();
         if (shot) {
-            down -= 0.05;
-            if (down < -1) {
+            down -= 0.09;
+            System.out.println(colide);
+            if (down < colide) {
                 shot = false; // trocar para colide
+                 try {
+                Thread.sleep(1000);
+            } catch(InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
             }
         } else {
             down = 0;
