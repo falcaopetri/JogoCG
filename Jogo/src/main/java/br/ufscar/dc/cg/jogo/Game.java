@@ -38,7 +38,7 @@ public class Game {
 
     public void do_move() {
         count_edges++;
-        if (count_edges == polygon.size() - 1) {
+        if (count_edges == polygon.size()+1) {
             state = GameState.NEXT_LEVEL;
         }
     }

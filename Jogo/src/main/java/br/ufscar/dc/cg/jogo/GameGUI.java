@@ -28,18 +28,13 @@ public class GameGUI {
     private double down = 0;
     private boolean shot = false;
     private boolean paint = false;
-    private int ite;
     private double disparo;
     private double colide;
 
-    /*
-        Callbacks
-     */
+    /* Callbacks*/
     private GLFWKeyCallback keyCallback;
 
     private void init() throws IOException {
-
-        ite = 0;
         if (!glfwInit()) {
             throw new IllegalStateException("Unable to initialize GLFW");
         }
@@ -154,6 +149,55 @@ public class GameGUI {
             shot = true;
             paint = true;
         }
+
+        if (paint) {
+            Polygon pol = game.getPolygon();
+            /*int mi = 0;
+            double maior = -2;
+            for (int i = 0; i < pol._poly.size(); ++i) {
+                Point p = pol._poly.get(i);
+                double ny = Point.rotationY(p.getX(), p.getY(), rotate + 10);
+                if (disparo == maior) {
+                    colide = disparo;
+                    colide += ny;
+                    colide /= 2;
+                    colide = 1 - Math.abs(colide);
+                    colide *= -1;
+                    if (colide > -0.5) {
+                        colide = -0.5;
+                    }
+                }
+
+                if (maior <= ny) {
+                    maior = ny;
+                    double nx = Point.rotationX(p.getX(), p.getY(), rotate + 10);
+                    disparo = maior;// - Math.abs(nx)/2.0;
+                    if (nx > 0.8) {
+                        mi = i - 1;
+                    } else {
+                        mi = i;
+                    }
+
+                }
+            }*/
+            int mi = pol.intersectAfterRotation(rotate);
+            System.out.println("intersects " + mi);
+
+            game.do_move();
+
+            pol._poly.get(mi).color = new RGBColor(Point.DEFAULT_COLOR3);
+            paint = false;
+        }
+
+        if (game.getState() == GameState.NEXT_LEVEL) {
+            game.next_level();
+        }
+
+        if (!shot && game.getState() == GameState.PLAYING) {
+            rotate += 0.7;
+            rotate = (rotate + 0.7f) % 360;
+        }
+
     }
 
     private void updateControls() {
@@ -161,7 +205,6 @@ public class GameGUI {
     }
 
     private void render() {
-        //glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
         drawPolygon();
         drawCursor();
     }
@@ -186,7 +229,8 @@ public class GameGUI {
     void drawCircle(double cx, double cy, double r) {
         int num_segments = 100;
 
-        glBegin(GL_LINE_LOOP);
+        glBegin(GL_POLYGON);
+        glColor3d(1, 1, 0);
         for (int ii = 0; ii < num_segments; ii++) {
             double theta = 2.0f * Math.PI * ii / num_segments; //get the current angle 
             double x = r * Math.cos(theta); //calculate the x component 
@@ -198,87 +242,23 @@ public class GameGUI {
 
     private void drawPolygon() {
         Polygon pol = game.getPolygon();
-        //System.out.println("p: " + pol._poly.size());
-        ite = (ite + 1) % pol._poly.size();
 
-        //System.out.println(ite);
-        double maior = -2;
-        int mi = 0;
         glPushMatrix();
         glRotated(rotate, 0.0, 0.0, 1.0);
-        //glTranslated(-pol._gravity_center.getX(), -pol._gravity_center.getY(), 0.0);
-        glBegin(GL_POLYGON);
 
-        //System.out.println(rotate);
-        for (int i = 0; i < pol._poly.size(); i++) {
-            Point p = pol._poly.get(i);
+        glBegin(GL_TRIANGLE_FAN);
 
+        glColor3d(Point.DEFAULT_COLOR1.R, Point.DEFAULT_COLOR1.G, Point.DEFAULT_COLOR1.B);
+        glVertex2d(0.0, 0.0); //center of triangles
+        for (int i = 0; i < pol._poly.size() + 1; ++i) {
+            Point p = pol._poly.get((i + 1) % pol._poly.size());
             glColor3d(p.color.R, p.color.G, p.color.B);
             glVertex2d(p.getX(), p.getY());
-            //System.out.println(ite);
-
-            double ny = Point.rotationY(p.getX(), p.getY(), rotate + 10);
-            if (disparo == maior) {
-                colide = disparo;
-                colide += ny;
-                colide /= 2;
-                colide = 1 - Math.abs(colide);
-                colide *= -1;
-                if (colide > -0.5) {
-                    colide = -0.5;
-                }
-
-            }
-            if (maior <= ny) {
-                maior = ny;
-                double nx = Point.rotationX(p.getX(), p.getY(), rotate + 10);
-                disparo = maior;// - Math.abs(nx)/2.0;
-                if (nx > 0.8) {
-                    mi = i - 1;
-                } else {
-                    mi = i;
-                }
-
-                if (mi < 0) {
-                    mi = pol._poly.size();
-                }
-            }
-
         }
         glEnd();
 
-        if (paint) {
-            //mi = pol.intersectAfterRotation(rotate);
-            System.out.println("intersects " + mi);
-
-            game.do_move();
-
-            pol._poly.get(mi).color.R = 0.7f;
-            int next_vertex = (mi + 1) % pol._poly.size();
-            pol._poly.get(next_vertex).color.R = 0.7f;
-            //System.out.println(mi);
-            paint = false;
-        }
-
-        if (game.getState() == GameState.NEXT_LEVEL) {
-            game.next_level();
-        }
-
-        glEnd();
-
-        if (!shot && game.getState() == GameState.PLAYING) {
-            rotate += 0.7;
-            rotate = (rotate + 0.7f) % 360;
-        }
-
-        for (int i = 0; i < pol._poly.size(); i += 2) {
-            Point p = pol._poly.get(i);
-            glColor3d(i * 1.0 / pol._poly.size(), 0.1, 0.1);
-            drawCircle(p.getX(), p.getY(), 0.05f);
-
-            p = pol._poly.get((i + 1) % pol._poly.size());
-            glColor3d(i * 1.0 / pol._poly.size(), 0.1, 0.1);
-            drawCircle(p.getX(), p.getY(), 0.05f);
+        for (Point p : pol._poly) {
+            drawCircle(p.getX(), p.getY(), 0.01);
         }
 
         glPopMatrix();
@@ -297,13 +277,14 @@ public class GameGUI {
         if (shot) {
             down -= SHOT_INCREMENT;
             System.out.println(colide);
-            if (down < colide) {
+            //if (down < colide) {
+            if (down < -1) {
                 shot = false; // trocar para colide
-                try {
+                /*try {
                     Thread.sleep(10);
                 } catch (InterruptedException ex) {
                     Thread.currentThread().interrupt();
-                }
+                }*/
             }
         } else {
             down = 0;
