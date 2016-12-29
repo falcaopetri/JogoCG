@@ -1,5 +1,8 @@
 package br.ufscar.dc.cg.jogo;
 
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+
 public class Point {
 
     private double _x, _y;
@@ -80,5 +83,23 @@ public class Point {
     @Override
     public String toString() {
         return String.format("Point (%1$f, %2$f)", getX(), getY());
+    }
+
+    Point rotate(double angle) {
+        double nx = rotationX(_x, _y, angle);
+        double ny = rotationY(_x, _y, angle);
+        return new Point(nx, ny);
+    }
+
+    private static double rotationX(double x, double y, double ang) {
+        double rad = ang * Math.PI / 180;
+        double nx = cos(rad) * x + sin(rad) * -1 * y;
+        return nx;
+    }
+
+    private static double rotationY(double x, double y, double ang) {
+        double rad = ang * Math.PI / 180;
+        double ny = sin(rad) * x + cos(rad) * y;
+        return ny;
     }
 }

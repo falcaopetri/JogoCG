@@ -5,6 +5,22 @@ import java.util.List;
 
 public class Polygon {
 
+    int intersectAfterRotation(double angle) {
+        int p = -1;
+        for (int i = 1; i < _poly.size(); i += 2) {
+            Point curr = this._poly.get(i).rotate(angle);
+            Point next = this._poly.get((i + 1) % _poly.size()).rotate(angle);
+
+            System.out.println("doing a " + curr.getX() + " " + next.getX());
+            if (next.getX() < 0 && 0 <= curr.getX()) {
+                p = i;
+                //break;
+            }
+        }
+
+        return p;
+    }
+
     static public class ConvexHull2D {
         // Source: http://www.java-gaming.org/index.php?topic=522.0
         // Points is filled with points to test, then stripped down to minimal set when hull calcualted
@@ -127,6 +143,15 @@ public class Polygon {
         ConvexHull2D ch = new ConvexHull2D();
         for (Point tmp : poly._poly) {
             ch.addPoint(tmp.getX(), tmp.getY());
+            /*Point p1 = new Point(tmp.getX() + 0.01f, tmp.getY());
+            Point p2 = new Point(tmp.getX(), tmp.getY() + 0.01f);
+            Point p3 = new Point(tmp.getX() - 0.01f, tmp.getY());
+            Point p4 = new Point(tmp.getX(), tmp.getY() - 0.01f);
+
+            ch.addPoint(p1.getX(), p1.getY());
+            ch.addPoint(p2.getX(), p2.getY());
+            ch.addPoint(p3.getX(), p3.getY());
+            ch.addPoint(p4.getX(), p4.getY());*/
         }
         ch.calculateHull();
 
@@ -136,14 +161,33 @@ public class Polygon {
             // TODO duplica vértices
             //Point p_dup = new Point(p.getX() + 0.001f, p.getY() + 0.001f);
             //poly.add(p_dup);
+            Point p_dup = new Point(p);
+            poly.add(p_dup);
         }
+
+        poly.bringCenterToOrigin();
+
         return poly;
     }
 
     public Polygon() {
         //_poly = new java.awt.Polygon();
-        _poly = new ArrayList<Point>();
+        _poly = new ArrayList<>();
         _edges_states = new ArrayList<>();
+    }
+
+    public void bringCenterToOrigin() {
+        List<Point> new_poly = new ArrayList<>();
+        for (Point p : _poly) {
+            new_poly.add(new Point(p.getX() - _gravity_center.getX(), p.getY() - _gravity_center.getY()));
+        }
+        _poly = new_poly;
+        calculate_gravity_center();
+
+        // TODO era pra esse assert valer? (porque ele não está valendo)
+        /*if (_gravity_center.getX() != _gravity_center.getY() || _gravity_center.getX() != 0) {
+            throw new AssertionError();
+        }*/
     }
 
     public static Polygon generate(int n) {

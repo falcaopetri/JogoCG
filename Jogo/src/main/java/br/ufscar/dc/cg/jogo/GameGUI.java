@@ -71,6 +71,16 @@ public class GameGUI {
                 if (key == GLFW_KEY_N && action == GLFW_RELEASE) {
                     game.next_level();
                 }
+                if (key == GLFW_KEY_R && action == GLFW_RELEASE) {
+                    game.reset_level();
+                }
+                if (key == GLFW_KEY_P && action == GLFW_RELEASE) {
+                    if (game.getState() == GameState.PLAYING) {
+                        game.pause();
+                    } else {
+                        game.resume();
+                    }
+                }
                 if (action == GLFW_PRESS/*|| action == GLFW_REPEAT*/) {
                     keyDown[key] = true;
                 } else {
@@ -189,16 +199,28 @@ public class GameGUI {
 
     private void drawPolygon() {
         Polygon pol = game.getPolygon();
-        System.out.println("p: " + pol._poly.size());
 
         ite = (ite + 1) % pol._poly.size();
 
+        if (paint) {
+            //double nx = rotationX(i.getX(),i.getY(),rotate);
+            //double ny = rotationY(i.getX(),i.getY(),rotate);
+            int mi = pol.intersectAfterRotation(rotate);
+            System.out.println("intersects " + mi);
+
+            pol._poly.get(mi).color.R = 0.7f;
+            int next_vertex = (mi + 1) % pol._poly.size();
+            pol._poly.get(next_vertex).color.R = 0.7f;
+            //System.out.println(mi);
+            paint = false;
+        }
+        //shot = true;
         //System.out.println(ite);
-        double maior = -2;
-        int mi = 0;
+        //double maior = -2;
+        //int mi = 0;
         glPushMatrix();
         glRotated(rotate, 0.0, 0.0, 1.0);
-        glTranslated(-pol._gravity_center.getX(), -pol._gravity_center.getY(), 0.0);
+        //glTranslated(-pol._gravity_center.getX(), -pol._gravity_center.getY(), 0.0);
         glBegin(GL_POLYGON);
 
         //System.out.println(rotate);
@@ -207,64 +229,25 @@ public class GameGUI {
             glColor3d(p.color.R, p.color.G, p.color.B);
             glVertex2d(p.getX(), p.getY());
             //System.out.println(ite);
-
-            double ny = rotationY(p.getX(), p.getY(), rotate);
-            if (maior <= ny) {
-                maior = ny;
-                double nx = rotationX(p.getX(), p.getY(), rotate);
-                if (nx > 0.8) {
-                    mi = i - 1;
-                } else {
-                    mi = i;
-                }
-
-                if (mi < 0) {
-                    mi = pol._poly.size() - 1;
-                }
-            }
-
         }
         glEnd();
 
-        if (paint) {
-            //double nx = rotationX(i.getX(),i.getY(),rotate);
-            //double ny = rotationY(i.getX(),i.getY(),rotate);
-            pol._poly.get(mi).color.R = 0.7f;
-            int next_vertex = (mi + 1) % pol._poly.size();
-            pol._poly.get(next_vertex).color.R = 0.7f;
-            //System.out.println(mi);
-            paint = false;
-        }
-
-        if (!shot) {
+        if (!shot && game.getState() == GameState.PLAYING) {
             rotate += 0.7;
             rotate = (rotate + 0.7f) % 360;
         }
 
-        glColor3f(1f, 0, 0);
-        for (int i = 0; i < pol._poly.size(); i += 1) {
-
+        for (int i = 0; i < pol._poly.size(); i += 2) {
             Point p = pol._poly.get(i);
-            glColor3f(1f, 0, 0);
+            glColor3d(i * 1.0 / pol._poly.size(), 0.1, 0.1);
             drawCircle(p.getX(), p.getY(), 0.05f);
-            /*p = pol._poly.get(i + 1);
-            glColor3f(0, 1f, 1f);
-            drawCircle(p.getX(), p.getY(), 0.05f);*/
+
+            p = pol._poly.get((i + 1) % pol._poly.size());
+            glColor3d(i * 1.0 / pol._poly.size(), 0.1, 0.1);
+            drawCircle(p.getX(), p.getY(), 0.05f);
         }
 
         glPopMatrix();
-    }
-
-    private double rotationX(double x, double y, double ang) {
-        double rad = ang * Math.PI / 180;
-        double nx = cos(rad) * x + sin(rad) * -1 * y;
-        return nx;
-    }
-
-    private double rotationY(double x, double y, double ang) {
-        double rad = ang * Math.PI / 180;
-        double ny = sin(rad) * x + cos(rad) * y;
-        return ny;
     }
 
     private void drawCursor() {
