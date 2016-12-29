@@ -7,6 +7,7 @@ public class Point {
 
     private double _x, _y;
     RGBColor color;
+    PointState state;
 
     // TODO mover para um lugar apropriado, talvez renomear para _TRIANGULO e _MIOLO
     public static RGBColor DEFAULT_COLOR1 = new RGBColor(0, 0.8, 0.7);
@@ -31,6 +32,7 @@ public class Point {
         _x = x;
         _y = y;
         color = new RGBColor(DEFAULT_COLOR2);
+        state = PointState.NOT_USED;
     }
 
     public Point(Point p) {

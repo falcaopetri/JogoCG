@@ -7,7 +7,7 @@ public class Polygon {
 
     int intersectAfterRotation(double angle) {
         int p = -1;
-        for (int i = 0; i < _poly.size(); i++) {
+        for (int i = 1; i < _poly.size(); i += 2) {
             Point curr = this._poly.get(i).rotate(angle);
             Point next = this._poly.get((i + 1) % _poly.size()).rotate(angle);
 
@@ -143,27 +143,14 @@ public class Polygon {
         ConvexHull2D ch = new ConvexHull2D();
         for (Point tmp : poly._poly) {
             ch.addPoint(tmp.getX(), tmp.getY());
-            /*Point p1 = new Point(tmp.getX() + 0.01f, tmp.getY());
-            Point p2 = new Point(tmp.getX(), tmp.getY() + 0.01f);
-            Point p3 = new Point(tmp.getX() - 0.01f, tmp.getY());
-            Point p4 = new Point(tmp.getX(), tmp.getY() - 0.01f);
-
-            ch.addPoint(p1.getX(), p1.getY());
-            ch.addPoint(p2.getX(), p2.getY());
-            ch.addPoint(p3.getX(), p3.getY());
-            ch.addPoint(p4.getX(), p4.getY());*/
         }
         ch.calculateHull();
 
         poly = new Polygon();
         for (Point p : ch.points) {
             poly.add(p);
-
-            // TODO duplica vértices
-            //Point p_dup = new Point(p.getX()+ 0.01f*p.getX() , p.getY()+ 0.01f*p.getY());
-            //poly.add(p_dup);
-            /*Point p_dup = new Point(p);
-            poly.add(p_dup);*/
+            Point p_dup = new Point(p);
+            poly.add(p_dup);
         }
 
         poly.bringCenterToOrigin();

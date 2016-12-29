@@ -183,9 +183,8 @@ public class GameGUI {
             int mi = pol.intersectAfterRotation(rotate);
             System.out.println("intersects " + mi);
 
-            game.do_move();
+            game.do_move(mi);
 
-            pol._poly.get(mi).color = new RGBColor(Point.DEFAULT_COLOR3);
             paint = false;
         }
 
@@ -276,7 +275,7 @@ public class GameGUI {
         glPopMatrix();
         if (shot) {
             down -= SHOT_INCREMENT;
-            System.out.println(colide);
+            //System.out.println(colide);
             //if (down < colide) {
             if (down < -1) {
                 shot = false; // trocar para colide

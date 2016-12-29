@@ -36,9 +36,20 @@ public class Game {
         reset_level();
     }
 
-    public void do_move() {
-        count_edges++;
-        if (count_edges == polygon.size()+1) {
+    public void do_move(int i) {
+        if (polygon._poly.get(i).state == PointState.USED) {
+            state = GameState.GAME_OVER;
+            return;
+        }
+
+        polygon._poly.get(i).color = new RGBColor(Point.DEFAULT_COLOR3);
+        polygon._poly.get(i).state = PointState.USED;
+        int next_vertex = (i + 1) % polygon._poly.size();
+        polygon._poly.get(next_vertex).color = new RGBColor(Point.DEFAULT_COLOR3);
+        polygon._poly.get(next_vertex).state = PointState.USED;
+        count_edges += 2;
+
+        if (count_edges == polygon.size()) {
             state = GameState.NEXT_LEVEL;
         }
     }
