@@ -7,7 +7,7 @@ public class Polygon {
 
     int intersectAfterRotation(double angle) {
         int p = -1;
-        for (int i = 1; i < _poly.size(); i += 2) {
+        for (int i = 0; i < _poly.size(); i++) {
             Point curr = this._poly.get(i).rotate(angle);
             Point next = this._poly.get((i + 1) % _poly.size()).rotate(angle);
 

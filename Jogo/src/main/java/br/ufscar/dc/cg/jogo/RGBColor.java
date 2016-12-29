@@ -9,4 +9,10 @@ class RGBColor {
         G = g;
         B = b;
     }
+
+    RGBColor(RGBColor color) {
+        R = color.R;
+        G = color.G;
+        B = color.B;
+    }
 }
