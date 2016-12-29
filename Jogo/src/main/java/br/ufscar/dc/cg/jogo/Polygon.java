@@ -283,6 +283,9 @@ public class Polygon {
     }
 
     private void calculate_gravity_center() {
+        // TODO calcula o centro de massa dos pontos, e não do polígono em si
+        // read: https://en.wikipedia.org/wiki/Centroid#Centroid_of_polygon
+        
         float x_sum = 0;
         float y_sum = 0;
 

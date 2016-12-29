@@ -74,4 +74,9 @@ public class Point {
         // Find length of dx,dy
         return (float) Math.sqrt(dx * dx + dy * dy);
     }
+
+    @Override
+    public String toString() {
+        return String.format("Point (%1$f, %2$f)", getX(), getY());
+    }
 }

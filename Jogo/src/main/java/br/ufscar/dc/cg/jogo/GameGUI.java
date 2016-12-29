@@ -38,6 +38,7 @@ public class GameGUI {
     private boolean paint = false;
     /*testeeeeeeeeeee
      */
+    // TODO corR deve ser do tamanho do polígono, ou seja, atualizado constantemente
     private float corR[] = new float[8];
     private int ite;
 
@@ -159,11 +160,7 @@ public class GameGUI {
             System.out.println("shot executed");
             lastShotTime = thisTime;
             shot = true;
-<<<<<<< HEAD
-=======
             paint = true;
->>>>>>> master
-
         }
     }
 
@@ -195,54 +192,41 @@ public class GameGUI {
     }
 
     private void drawPolygon() {
-
-<<<<<<< HEAD
         Polygon pol = game.getPolygon();
         System.out.println("p: " + pol._poly.size());
-        // TODO aplicar translação de acordo com pol.getGravityCenter()
-=======
-        Polygon pol = Polygon.generate(4);
 
-        ite++;
-        if (ite == 4) {
-            ite = 0;
-        }
+        ite = (ite + 1) % pol._poly.size();
+
         //System.out.println(ite);
         double maior = -2;
         int mi = 0;
->>>>>>> master
         glPushMatrix();
-        glTranslatef(0, -0.1f, 0.0f);
         glRotated(rotate, 0.0, 0.0, 1.0);
+        glTranslatef(-pol._gravity_center.getX(), -pol._gravity_center.getY(), 0.0f);
         glBegin(GL_POLYGON);
-<<<<<<< HEAD
-        for (Point i : pol._poly) {
-            glColor3f(0.0f, 0.0f, 1.0f);
-            glVertex2f(i.getX(), i.getY());
-        }
 
-        glEnd();
-        rotate += 0.7;
         //System.out.println(rotate);
-=======
         for (int i = 0; i < pol._poly.size(); i++) {
             Point p = pol._poly.get(i);
             glColor3f(corR[i], 0.0f, 1.0f);
             glVertex2f(p.getX(), p.getY());
             //System.out.println(ite);
-            
-                double ny = rotationY(p.getX(), p.getY(), rotate);
-                if (maior <= ny) {
-                    maior = ny;
-                    double nx = rotationX(p.getX(),p.getY(),rotate);
-                    if(nx > 0.8)
-                    mi = i-1;
-                    else
+
+            double ny = rotationY(p.getX(), p.getY(), rotate);
+            if (maior <= ny) {
+                maior = ny;
+                double nx = rotationX(p.getX(), p.getY(), rotate);
+                if (nx > 0.8) {
+                    mi = i - 1;
+                } else {
                     mi = i;
-                    
-                    if(mi < 0 )mi = pol._poly.size();
                 }
-            
+
+                if (mi < 0) {
+                    mi = pol._poly.size();
+                }
+            }
+
         }
 
         if (paint) {
@@ -256,22 +240,19 @@ public class GameGUI {
         }
         glEnd();
         rotate += 0.7;
-        if (rotate == 360) {
-            rotate = 0;
-        }
+        rotate = (rotate + 0.7f) % 360;
 
->>>>>>> master
         glPopMatrix();
     }
 
     private double rotationX(float x, float y, double ang) {
-        double rad = ang*Math.PI/180;
+        double rad = ang * Math.PI / 180;
         double nx = cos(rad) * x + sin(rad) * -1 * y;
         return nx;
     }
 
     private double rotationY(float x, float y, double ang) {
-        double rad = ang*Math.PI/180;
+        double rad = ang * Math.PI / 180;
         double ny = sin(rad) * x + cos(rad) * y;
         return ny;
     }
@@ -287,11 +268,7 @@ public class GameGUI {
         glEnd();
         glPopMatrix();
         if (shot) {
-<<<<<<< HEAD
             down -= 0.05;
-=======
-            down -= 0.5;
->>>>>>> master
             if (down < -1) {
                 shot = false; // trocar para colide
             }
