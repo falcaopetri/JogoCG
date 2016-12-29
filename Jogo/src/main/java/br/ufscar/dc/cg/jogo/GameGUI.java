@@ -3,7 +3,6 @@ package br.ufscar.dc.cg.jogo;
 import java.io.IOException;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
-import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import org.lwjgl.BufferUtils;
 import static org.lwjgl.glfw.GLFW.*;
@@ -20,7 +19,7 @@ public class GameGUI {
 
     private Game game;
     private Polygon arrow;
-    
+
     private long window;
     private static int WIDTH = 600;
     private static int HEIGHT = 600;
@@ -39,7 +38,7 @@ public class GameGUI {
     /*testeeeeeeeeeee
      */
     // TODO corR deve ser do tamanho do polígono, ou seja, atualizado constantemente
-  
+
     private int ite;
     private double disparo;
     private double colide;
@@ -207,20 +206,21 @@ public class GameGUI {
             glVertex2f(p.getX(), p.getY());
             //System.out.println(ite);
 
-            double ny = rotationY(p.getX(), p.getY(), rotate+10);
-            if(disparo == maior){
+            double ny = rotationY(p.getX(), p.getY(), rotate + 10);
+            if (disparo == maior) {
                 colide = disparo;
                 colide += ny;
                 colide /= 2;
                 colide = 1 - Math.abs(colide);
-                colide *=-1;
-                if(colide > -0.5) colide = -0.5;
-                
-              
+                colide *= -1;
+                if (colide > -0.5) {
+                    colide = -0.5;
+                }
+
             }
             if (maior <= ny) {
                 maior = ny;
-                double nx = rotationX(p.getX(), p.getY(), rotate+10);
+                double nx = rotationX(p.getX(), p.getY(), rotate + 10);
                 disparo = maior;// - Math.abs(nx)/2.0;
                 if (nx > 0.8) {
                     mi = i - 1;
@@ -236,34 +236,33 @@ public class GameGUI {
         }
 
         if (paint) {
-            
+
             //double nx = rotationX(i.getX(),i.getY(),rotate);
             //double ny = rotationY(i.getX(),i.getY(),rotate);
             //pol._edges_states.set(ite, true);               
             game.corR.set(mi, 0.7f);
-            game.corR.set((mi) % pol._poly.size()+1, 0.7f);
+            game.corR.set((mi + 1) % pol._poly.size(), 0.7f);
             //corR[(ite + 1) % 4] = 0.7f;
             //System.out.println(mi);
             paint = false;
             //game.next_level();
         }
-        for (int i=0; i < pol._poly.size();i++){
+        for (int i = 0; i < pol._poly.size(); i++) {
             passou = true;
-           // System.out.println(game.corR.get(i));
-            if(game.corR.get(i) == 0) {   
-               //System.out.println(game.corR.get(i));
+            // System.out.println(game.corR.get(i));
+            if (game.corR.get(i) == 0) {
+                //System.out.println(game.corR.get(i));
                 passou = false;
                 //System.out.println(passou);
                 break;
             }
-            
-            
+
         }
-        if(passou){
+        if (passou) {
             game.next_level();
             game.attCorR();
-            
         }
+
         glEnd();
         rotate += 0.7;
         rotate = (rotate + 0.7f) % 360;
@@ -298,11 +297,11 @@ public class GameGUI {
             System.out.println(colide);
             if (down < colide) {
                 shot = false; // trocar para colide
-                 try {
-                Thread.sleep(1000);
-            } catch(InterruptedException ex) {
-                Thread.currentThread().interrupt();
-            }
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException ex) {
+                    Thread.currentThread().interrupt();
+                }
             }
         } else {
             down = 0;

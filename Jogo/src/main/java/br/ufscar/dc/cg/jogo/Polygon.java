@@ -209,7 +209,7 @@ public class Polygon {
             xs2[i] = xs.get(i);
             ys2[i] = ys.get(i);
         }
-        System.out.println("xs: " + xs.size());
+        //System.out.println("xs: " + xs.size());
         return Polygon.create(xs2, ys2);
     }
 
