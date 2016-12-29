@@ -260,7 +260,6 @@ public class GameGUI {
         }
         if (passou) {
             game.next_level();
-            game.attCorR();
         }
 
         glEnd();

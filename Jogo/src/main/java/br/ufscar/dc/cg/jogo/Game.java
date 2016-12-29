@@ -36,6 +36,7 @@ public class Game {
     public void reset() {
         level = 1;
         polygon = Polygon.generate(level + 2);
+        attCorR();
     }
 
     public boolean do_move() {
@@ -45,5 +46,6 @@ public class Game {
     public void next_level() {
         level += 1;
         polygon = Polygon.generate(level + 2);
+        attCorR();
     }
 }
