@@ -3,7 +3,6 @@ package br.ufscar.dc.cg.jogo;
 import java.io.IOException;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
-import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
 import org.lwjgl.BufferUtils;
 import static org.lwjgl.glfw.GLFW.*;
@@ -12,10 +11,6 @@ import org.lwjgl.opengl.GL;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.*;
 
-/**
- *
- * @author petri
- */
 public class GameGUI {
 
     private Game game;
@@ -24,11 +19,10 @@ public class GameGUI {
     private long window;
     private static int WIDTH = 600;
     private static int HEIGHT = 600;
-    private static int shotMilliseconds = 500;
+    private static int SHOT_DEBOUNCE_DELAY = 500; // in milliseconds
+    private static float SHOT_INCREMENT = 0.04f;
 
-    /*
-        Status flags
-     */
+    /* Status flags */
     private boolean[] keyDown = new boolean[GLFW.GLFW_KEY_LAST];
     private boolean spaceKeyDown = false;
     private long lastShotTime = 0L;
@@ -36,10 +30,7 @@ public class GameGUI {
     private float down = 0;
     private boolean shot = false;
     private boolean paint = false;
-    /*testeeeeeeeeeee
-     */
-    // TODO corR deve ser do tamanho do polígono, ou seja, atualizado constantemente
-    private float corR[] = new float[8];
+    /* testeeeeeeeeeee */
     private int ite;
 
     /*
@@ -48,14 +39,6 @@ public class GameGUI {
     private GLFWKeyCallback keyCallback;
 
     private void init() throws IOException {
-        corR[0] = 0.0f;
-        corR[1] = 0.0f;
-        corR[2] = 0.0f;
-        corR[3] = 0.0f;
-        corR[4] = 0.0f;
-        corR[5] = 0.0f;
-        corR[6] = 0.0f;
-        corR[7] = 0.0f;
         ite = 0;
         if (!glfwInit()) {
             throw new IllegalStateException("Unable to initialize GLFW");
@@ -155,7 +138,7 @@ public class GameGUI {
         updateControls();
 
         /* Let the player shoot */
-        if (spaceKeyDown && (thisTime - lastShotTime >= 1E6 * shotMilliseconds)) {
+        if (spaceKeyDown && (thisTime - lastShotTime >= 1E6 * SHOT_DEBOUNCE_DELAY)) {
             game.do_move();
             System.out.println("shot executed");
             lastShotTime = thisTime;
@@ -191,6 +174,19 @@ public class GameGUI {
         }
     }
 
+    void drawCircle(float cx, float cy, float r) {
+        int num_segments = 100;
+
+        glBegin(GL_LINE_LOOP);
+        for (int ii = 0; ii < num_segments; ii++) {
+            float theta = 2.0f * (float) Math.PI * ii / num_segments; //get the current angle 
+            float x = r * (float) Math.cos(theta); //calculate the x component 
+            float y = r * (float) Math.sin(theta); //calculate the y component 
+            glVertex2f(x + cx, y + cy); //output vertex 
+        }
+        glEnd();
+    }
+
     private void drawPolygon() {
         Polygon pol = game.getPolygon();
         System.out.println("p: " + pol._poly.size());
@@ -208,7 +204,7 @@ public class GameGUI {
         //System.out.println(rotate);
         for (int i = 0; i < pol._poly.size(); i++) {
             Point p = pol._poly.get(i);
-            glColor3f(corR[i], 0.0f, 1.0f);
+            glColor3f(p.color.R, p.color.G, p.color.B);
             glVertex2f(p.getX(), p.getY());
             //System.out.println(ite);
 
@@ -223,25 +219,38 @@ public class GameGUI {
                 }
 
                 if (mi < 0) {
-                    mi = pol._poly.size();
+                    mi = pol._poly.size() - 1;
                 }
             }
 
         }
+        glEnd();
 
         if (paint) {
             //double nx = rotationX(i.getX(),i.getY(),rotate);
             //double ny = rotationY(i.getX(),i.getY(),rotate);
-            //pol._edges_states.set(ite, true);               
-            corR[mi] = 0.7f;
-            corR[(mi + 1) % pol._poly.size()] = 0.7f;
-            //corR[(ite + 1) % 4] = 0.7f;
+            pol._poly.get(mi).color.R = 0.7f;
+            int next_vertex = (mi + 1) % pol._poly.size();
+            pol._poly.get(next_vertex).color.R = 0.7f;
             //System.out.println(mi);
             paint = false;
         }
-        glEnd();
-        rotate += 0.7;
-        rotate = (rotate + 0.7f) % 360;
+
+        if (!shot) {
+            rotate += 0.7;
+            rotate = (rotate + 0.7f) % 360;
+        }
+
+        glColor3f(1f, 0, 0);
+        for (int i = 0; i < pol._poly.size(); i += 1) {
+
+            Point p = pol._poly.get(i);
+            glColor3f(1f, 0, 0);
+            drawCircle(p.getX(), p.getY(), 0.05f);
+            /*p = pol._poly.get(i + 1);
+            glColor3f(0, 1f, 1f);
+            drawCircle(p.getX(), p.getY(), 0.05f);*/
+        }
 
         glPopMatrix();
     }
@@ -269,7 +278,7 @@ public class GameGUI {
         glEnd();
         glPopMatrix();
         if (shot) {
-            down -= 0.05;
+            down -= SHOT_INCREMENT;
             if (down < -1) {
                 shot = false; // trocar para colide
             }

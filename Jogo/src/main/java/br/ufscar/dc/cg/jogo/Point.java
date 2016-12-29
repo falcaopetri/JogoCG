@@ -2,13 +2,14 @@ package br.ufscar.dc.cg.jogo;
 
 public class Point {
 
+    private float _x, _y;
+    RGBColor color;
+
     public static Point random(float max_x, float max_y) {
         float x = (float) Math.random() * max_x;
         float y = (float) Math.random() * max_y;
         return new Point(x, y);
     }
-
-    private float _x, _y;
 
     public float getX() {
         return _x;
@@ -21,6 +22,7 @@ public class Point {
     public Point(float x, float y) {
         _x = x;
         _y = y;
+        color = new RGBColor(0f, 0f, 1f);
     }
 
     public Point(Point p) {
