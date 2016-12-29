@@ -1,28 +1,26 @@
 package br.ufscar.dc.cg.jogo;
 
-import java.util.ArrayList;
-import java.util.List;
-
-/**
- *
- * @author petri
- */
 public class Game {
 
     private int level;
     private Polygon polygon;
-    public List<Float> corR;
-
-    public void attCorR() {
-        corR = new ArrayList<Float>();
-        for (int i = 0; i <= level + 2; i++) {
-            corR.add(new Float(0.0));
-            System.out.println(corR.get(i));
-        }
-    }
+    private int count_edges;
+    private GameState state;
 
     public int getLevel() {
         return level;
+    }
+
+    public GameState getState() {
+        return state;
+    }
+
+    public void pause() {
+        this.state = GameState.PAUSED;
+    }
+
+    public void resume() {
+        this.state = GameState.PLAYING;
     }
 
     public Polygon getPolygon() {
@@ -35,17 +33,24 @@ public class Game {
 
     public void reset() {
         level = 1;
-        polygon = Polygon.generate(level + 2);
-        attCorR();
+        reset_level();
     }
 
-    public boolean do_move() {
-        return false;
+    public void do_move() {
+        count_edges++;
+        if (count_edges == polygon.size() - 1) {
+            state = GameState.NEXT_LEVEL;
+        }
     }
 
     public void next_level() {
         level += 1;
+        reset_level();
+    }
+
+    void reset_level() {
         polygon = Polygon.generate(level + 2);
-        attCorR();
+        state = GameState.PLAYING;
+        count_edges = 0;
     }
 }
