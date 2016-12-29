@@ -20,14 +20,14 @@ public class GameGUI {
     private static int WIDTH = 600;
     private static int HEIGHT = 600;
     private static int SHOT_DEBOUNCE_DELAY = 500; // in milliseconds
-    private static float SHOT_INCREMENT = 0.04f;
+    private static double SHOT_INCREMENT = 0.04;
 
     /* Status flags */
     private boolean[] keyDown = new boolean[GLFW.GLFW_KEY_LAST];
     private boolean spaceKeyDown = false;
     private long lastShotTime = 0L;
-    private float rotate = 1;
-    private float down = 0;
+    private double rotate = 1;
+    private double down = 0;
     private boolean shot = false;
     private boolean paint = false;
     /* testeeeeeeeeeee */
@@ -174,15 +174,15 @@ public class GameGUI {
         }
     }
 
-    void drawCircle(float cx, float cy, float r) {
+    void drawCircle(double cx, double cy, double r) {
         int num_segments = 100;
 
         glBegin(GL_LINE_LOOP);
         for (int ii = 0; ii < num_segments; ii++) {
-            float theta = 2.0f * (float) Math.PI * ii / num_segments; //get the current angle 
-            float x = r * (float) Math.cos(theta); //calculate the x component 
-            float y = r * (float) Math.sin(theta); //calculate the y component 
-            glVertex2f(x + cx, y + cy); //output vertex 
+            double theta = 2.0f * Math.PI * ii / num_segments; //get the current angle 
+            double x = r * Math.cos(theta); //calculate the x component 
+            double y = r * Math.sin(theta); //calculate the y component 
+            glVertex2d(x + cx, y + cy); //output vertex 
         }
         glEnd();
     }
@@ -198,14 +198,14 @@ public class GameGUI {
         int mi = 0;
         glPushMatrix();
         glRotated(rotate, 0.0, 0.0, 1.0);
-        glTranslatef(-pol._gravity_center.getX(), -pol._gravity_center.getY(), 0.0f);
+        glTranslated(-pol._gravity_center.getX(), -pol._gravity_center.getY(), 0.0);
         glBegin(GL_POLYGON);
 
         //System.out.println(rotate);
         for (int i = 0; i < pol._poly.size(); i++) {
             Point p = pol._poly.get(i);
-            glColor3f(p.color.R, p.color.G, p.color.B);
-            glVertex2f(p.getX(), p.getY());
+            glColor3d(p.color.R, p.color.G, p.color.B);
+            glVertex2d(p.getX(), p.getY());
             //System.out.println(ite);
 
             double ny = rotationY(p.getX(), p.getY(), rotate);
@@ -255,13 +255,13 @@ public class GameGUI {
         glPopMatrix();
     }
 
-    private double rotationX(float x, float y, double ang) {
+    private double rotationX(double x, double y, double ang) {
         double rad = ang * Math.PI / 180;
         double nx = cos(rad) * x + sin(rad) * -1 * y;
         return nx;
     }
 
-    private double rotationY(float x, float y, double ang) {
+    private double rotationY(double x, double y, double ang) {
         double rad = ang * Math.PI / 180;
         double ny = sin(rad) * x + cos(rad) * y;
         return ny;
@@ -269,11 +269,11 @@ public class GameGUI {
 
     private void drawCursor() {
         glPushMatrix();
-        glColor3f(0.0f, 1.0f, 0.0f);
-        glTranslatef(0, down, 0.0f);
+        glColor3d(0.0, 1.0, 0.0);
+        glTranslated(0.0, down, 0.0);
         glBegin(GL_POLYGON);
         for (Point i : arrow._poly) {
-            glVertex2f(i.getX(), i.getY());
+            glVertex2d(i.getX(), i.getY());
         }
         glEnd();
         glPopMatrix();

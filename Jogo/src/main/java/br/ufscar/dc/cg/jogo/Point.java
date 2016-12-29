@@ -2,24 +2,24 @@ package br.ufscar.dc.cg.jogo;
 
 public class Point {
 
-    private float _x, _y;
+    private double _x, _y;
     RGBColor color;
 
-    public static Point random(float max_x, float max_y) {
-        float x = (float) Math.random() * max_x;
-        float y = (float) Math.random() * max_y;
+    public static Point random(double max_x, double max_y) {
+        double x = Math.random() * max_x;
+        double y = Math.random() * max_y;
         return new Point(x, y);
     }
 
-    public float getX() {
+    public double getX() {
         return _x;
     }
 
-    public float getY() {
+    public double getY() {
         return _y;
     }
 
-    public Point(float x, float y) {
+    public Point(double x, double y) {
         _x = x;
         _y = y;
         color = new RGBColor(0f, 0f, 1f);
@@ -48,33 +48,33 @@ public class Point {
         _y += point.getY();
     }
 
-    public float dot(Point point) {
+    public double dot(Point point) {
         return point.getX() * _x + point.getY() * _y;
     }
 
-    public float length() {
-        float dot = dot(this);
-        return (float) Math.sqrt(dot);
+    public double length() {
+        double dot = dot(this);
+        return Math.sqrt(dot);
     }
 
     public void normalise() {
-        float length = length();
+        double length = length();
         _x = _x / length;
         _y = _y / length;
     }
 
-    public float angle(Point point) {
-        float angle = (this.dot(point)) / (this.length() * point.length());
+    public double angle(Point point) {
+        double angle = (this.dot(point)) / (this.length() * point.length());
 
-        return (float) Math.acos(angle);
+        return Math.acos(angle);
     }
 
-    public float distanceTo(Point point) {
-        float dx = point.getX() - _x;
-        float dy = point.getY() - _y;
+    public double distanceTo(Point point) {
+        double dx = point.getX() - _x;
+        double dy = point.getY() - _y;
 
         // Find length of dx,dy
-        return (float) Math.sqrt(dx * dx + dy * dy);
+        return Math.sqrt(dx * dx + dy * dy);
     }
 
     @Override

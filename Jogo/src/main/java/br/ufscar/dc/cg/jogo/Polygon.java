@@ -18,7 +18,7 @@ public class Polygon {
             testedPoints = new ArrayList<>();
         }
 
-        public void addPoint(float x, float y) {
+        public void addPoint(double x, double y) {
             Point newPoint = new Point(x, y);
 
             points.add(newPoint);
@@ -62,7 +62,7 @@ public class Polygon {
                 // March around the edge. Finish when we get back to where we started
                 while (true) {
                     // Find next point with largest right turn relative to current
-                    float currentAngle = 181f;
+                    double currentAngle = 181f;
                     for (int i = 0; i < points.size(); i++) {
                         Point testPoint = (Point) points.get(i);
 
@@ -71,7 +71,7 @@ public class Polygon {
                         testDirection.subtract(currentPoint);
                         testDirection.normalise();
 
-                        float testAngle = currentDirection.angle(testDirection);
+                        double testAngle = currentDirection.angle(testDirection);
 
                         // Update next point with test if smaller angle
                         if (testAngle < currentAngle) {
@@ -157,8 +157,8 @@ public class Polygon {
     }
 
     private static Polygon generateFromCircle(int n) {
-        /*float xs[] = new float[n];
-        float ys[] = new float[n];*/
+        /*double xs[] = new double[n];
+        double ys[] = new double[n];*/
         ArrayList<Float> xs = new ArrayList<>();
         ArrayList<Float> ys = new ArrayList<>();
 
@@ -168,20 +168,20 @@ public class Polygon {
         for (int i = 0; i < n; ++i) {
             angles[i] = Math.random() * 2 * Math.PI;
         }
-        float xs2[] = new float[n];
-        float ys2[] = new float[n];
+        double xs2[] = new double[n];
+        double ys2[] = new double[n];
         for (int i = 0; i < n; i++) {
             x = x0 + r * Math.cos(angles[i]);
             y = y0 + r * Math.sin(angles[i]);
-            xs2[i] = (float) x;
-            ys2[i] = (float) y;
+            xs2[i] = (double) x;
+            ys2[i] = (double) y;
         }
         return Polygon.create(xs2, ys2);
     }
 
     private static Polygon generateLikeACircle(int n) {
-        /*float xs[] = new float[n];
-        float ys[] = new float[n];*/
+        /*double xs[] = new double[n];
+        double ys[] = new double[n];*/
         ArrayList<Float> xs = new ArrayList<>();
         ArrayList<Float> ys = new ArrayList<>();
 
@@ -201,8 +201,8 @@ public class Polygon {
             ys.add(new Float(y));
         }
 
-        float xs2[] = new float[xs.size()];
-        float ys2[] = new float[xs.size()];
+        double xs2[] = new double[xs.size()];
+        double ys2[] = new double[xs.size()];
 
         for (int i = 0; i < xs.size(); ++i) {
             xs2[i] = xs.get(i);
@@ -212,7 +212,7 @@ public class Polygon {
         return Polygon.create(xs2, ys2);
     }
 
-    public static Polygon create(float x[], float y[]) {
+    public static Polygon create(double x[], double y[]) {
         if (x.length != y.length) {
             throw new IllegalArgumentException();
         }
@@ -226,7 +226,7 @@ public class Polygon {
         return p;
     }
 
-    public void add(float x, float y) {
+    public void add(double x, double y) {
         add(new Point(x, y));
     }
 
@@ -293,8 +293,8 @@ public class Polygon {
     }
 
     private Point calculate_gravity_center_mean() {
-        float x_sum = 0;
-        float y_sum = 0;
+        double x_sum = 0;
+        double y_sum = 0;
 
         for (Point p : _poly) {
             x_sum += p.getX();
@@ -305,11 +305,11 @@ public class Polygon {
     }
 
     private Point calculate_gravity_center_centroid() {
-        float twicearea = 0;
-        float x = 0;
-        float y = 0;
+        double twicearea = 0;
+        double x = 0;
+        double y = 0;
         Point p1, p2;
-        float f;
+        double f;
         Point off = _poly.get(0);
         for (int i = 0, j = _poly.size() - 1; i < _poly.size(); j = i++) {
             p1 = _poly.get(i);
