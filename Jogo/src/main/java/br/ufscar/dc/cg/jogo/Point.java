@@ -8,6 +8,11 @@ public class Point {
     private double _x, _y;
     RGBColor color;
 
+    // TODO mover para um lugar apropriado, talvez renomear para _TRIANGULO e _MIOLO
+    public static RGBColor DEFAULT_COLOR1 = new RGBColor(0, 0.8, 0.7);
+    public static RGBColor DEFAULT_COLOR2 = new RGBColor(0, 0, 1);
+    public static RGBColor DEFAULT_COLOR3 = new RGBColor(1, 0, 0);
+
     public static Point random(double max_x, double max_y) {
         double x = Math.random() * max_x;
         double y = Math.random() * max_y;
@@ -25,7 +30,7 @@ public class Point {
     public Point(double x, double y) {
         _x = x;
         _y = y;
-        color = new RGBColor(0f, 0f, 1f);
+        color = new RGBColor(DEFAULT_COLOR2);
     }
 
     public Point(Point p) {
