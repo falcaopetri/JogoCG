@@ -21,6 +21,34 @@ public class Polygon {
         return p;
     }
 
+    private Pair<Double, Double> min_max_angle(Point p) {
+        double angle_min = Double.MAX_VALUE;
+        double angle_max = Double.MIN_VALUE;
+
+        if (_poly.size() < 2) {
+            return new Pair<Double, Double>(angle_min, angle_max);
+        }
+
+        _poly.add(p);
+
+        for (int i = 0; i < _poly.size() + 1; ++i) {
+            Point p1 = _poly.get((i) % _poly.size());
+            Point p2 = _poly.get((i + 1) % _poly.size());
+            Point p3 = _poly.get((i + 2) % _poly.size());
+
+            Point v1 = new Point(p2);
+            v1.subtract(p1);
+            Point v2 = new Point(p3);
+            v2.subtract(p2);
+
+            angle_min = Math.min(angle_min, v1.angle(v2));
+            angle_max = Math.max(angle_max, v1.angle(v2));
+        }
+
+        _poly.remove(p);
+        return new Pair<Double, Double>(angle_min, angle_max);
+    }
+
     static public class ConvexHull2D {
         // Source: http://www.java-gaming.org/index.php?topic=522.0
         // Points is filled with points to test, then stripped down to minimal set when hull calcualted
@@ -129,16 +157,28 @@ public class Polygon {
     Point _gravity_center;
 
     private static Polygon generateFromRandomPoints(int n) {
+        int tries_left = 5000;
         Polygon poly = new Polygon();
+        Pair<Double, Double> angle_pair;
         for (int i = 0; i < n; ++i) {
             Point p;
+
             do {
-                p = Point.random(1.0f, 1.0f);
-            } while (poly.is_inside(p));
+                if (tries_left == 0) {
+                    throw new InstantiationError("too many tries");
+                }
+                p = Point.random(1.2, 1.2);
+                angle_pair = poly.min_max_angle(p);
+
+                tries_left--;
+
+            } while (poly.is_inside(p) || p.min_distance(poly._poly) < 0.07 || angle_pair.getFirst() < 0.35/* || angle_pair.getSecond() > 2.5*/);
+            System.out.println("angle: " + angle_pair);
             poly.add(p);
 
             poly.ccw_sort();
         }
+        System.out.println("");
 
         ConvexHull2D ch = new ConvexHull2D();
         for (Point tmp : poly._poly) {

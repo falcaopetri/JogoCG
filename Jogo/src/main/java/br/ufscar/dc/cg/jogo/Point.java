@@ -2,6 +2,7 @@ package br.ufscar.dc.cg.jogo;
 
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
+import java.util.List;
 
 public class Point {
 
@@ -74,7 +75,13 @@ public class Point {
     }
 
     public double angle(Point point) {
-        double angle = (this.dot(point)) / (this.length() * point.length());
+        double num = this.dot(point);
+        double dem = this.length() * point.length();
+        if (dem == 0) {
+            return Math.PI / 2;
+        }
+
+        double angle = num / dem;
 
         return Math.acos(angle);
     }
@@ -108,5 +115,14 @@ public class Point {
         double rad = ang * Math.PI / 180;
         double ny = sin(rad) * x + cos(rad) * y;
         return ny;
+    }
+
+    double min_distance(List<Point> list) {
+        double d = Double.MAX_VALUE;
+        for (Point p : list) {
+            d = Math.min(d, this.distanceTo(p));
+        }
+
+        return d;
     }
 }
