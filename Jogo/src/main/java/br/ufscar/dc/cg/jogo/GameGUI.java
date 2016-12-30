@@ -297,11 +297,11 @@ public class GameGUI {
             System.out.println(colide);
             if (down < colide) {
                 shot = false; // trocar para colide
-                try {
+                /*try {
                     Thread.sleep(1000);
                 } catch (InterruptedException ex) {
                     Thread.currentThread().interrupt();
-                }
+                }*/
             }
         } else {
             down = 0;
