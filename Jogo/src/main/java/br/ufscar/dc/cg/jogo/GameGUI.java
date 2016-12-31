@@ -19,7 +19,9 @@ public class GameGUI {
     private static final int HEIGHT = 600;
     private static final int SHOT_DEBOUNCE_DELAY = 200; // in milliseconds
     private static final double SHOT_INCREMENT = 0.09;
-    private static double ROTATION_INCREMENT = 0.7;
+    private static double ROTATION_INCREMENT = 0.2;
+    private static int ROTATION_ORIENTATION = 1;
+    private static final double ROTATION_BASE_INCREMENT = 0.5;
 
     /* Status flags */
     private final boolean[] keyDown = new boolean[GLFW.GLFW_KEY_LAST];
@@ -72,11 +74,8 @@ public class GameGUI {
                     game.reset_level();
                 }
                 if (key == GLFW_KEY_Q && action == GLFW_RELEASE) {
-                    if (ROTATION_INCREMENT < 0) {
-                        ROTATION_INCREMENT = -ROTATION_INCREMENT + 0.1;
-                    } else {
-                        ROTATION_INCREMENT = -ROTATION_INCREMENT - 0.1;
-                    }
+                    ROTATION_ORIENTATION = -ROTATION_ORIENTATION;
+                    ROTATION_INCREMENT += 0.1;
                 }
                 if (key == GLFW_KEY_P && action == GLFW_RELEASE) {
                     if (game.getState() == GameState.PLAYING) {
@@ -197,12 +196,12 @@ public class GameGUI {
             game.next_level();
             double random = Math.random();
             if (random < 0.5) {
-                ROTATION_INCREMENT = -ROTATION_INCREMENT;
+                ROTATION_ORIENTATION = -ROTATION_ORIENTATION;
             }
         }
 
         if (/*!shot &&*/game.getState() == GameState.PLAYING) {
-            rotate = (rotate + ROTATION_INCREMENT * (1 + game.getLevel() / 10)) % 360;
+            rotate = (rotate + ROTATION_ORIENTATION * (ROTATION_BASE_INCREMENT + ROTATION_INCREMENT) * (1 + game.getLevel() / 10)) % 360;
         }
 
     }
