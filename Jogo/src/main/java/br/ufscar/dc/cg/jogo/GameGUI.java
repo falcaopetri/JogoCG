@@ -15,14 +15,14 @@ public class GameGUI {
     private Polygon arrow;
 
     private long window;
-    private static int WIDTH = 600;
-    private static int HEIGHT = 600;
-    private static int SHOT_DEBOUNCE_DELAY = 200; // in milliseconds
-    private static double SHOT_INCREMENT = 0.09;
+    private static final int WIDTH = 600;
+    private static final int HEIGHT = 600;
+    private static final int SHOT_DEBOUNCE_DELAY = 200; // in milliseconds
+    private static final double SHOT_INCREMENT = 0.09;
     private static double ROTATION_INCREMENT = 0.7;
 
     /* Status flags */
-    private boolean[] keyDown = new boolean[GLFW.GLFW_KEY_LAST];
+    private final boolean[] keyDown = new boolean[GLFW.GLFW_KEY_LAST];
     private boolean spaceKeyDown = false;
     private long lastShotTime = 0L;
     private double rotate = 1;
@@ -48,7 +48,7 @@ public class GameGUI {
         // Configure our window
         glfwDefaultWindowHints(); // optional, the current window hints are already the default
         glfwWindowHint(GLFW_VISIBLE, GLFW_FALSE); // the window will stay hidden after creation
-        glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE); // the window will be resizable
+        glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // the window will be resizable
 
         // Create the window
         window = glfwCreateWindow(WIDTH, HEIGHT, "Hello World!", NULL, NULL);
@@ -57,6 +57,7 @@ public class GameGUI {
         }
 
         glfwSetKeyCallback(window, keyCallback = new GLFWKeyCallback() {
+            @Override
             public void invoke(long window, int key, int scancode, int action, int mods) {
                 if (key == GLFW_KEY_UNKNOWN) {
                     return;
@@ -84,11 +85,7 @@ public class GameGUI {
                         game.resume();
                     }
                 }
-                if (action == GLFW_PRESS/*|| action == GLFW_REPEAT*/) {
-                    keyDown[key] = true;
-                } else {
-                    keyDown[key] = false;
-                }
+                keyDown[key] = (action == GLFW_PRESS);
             }
         });
 
@@ -217,6 +214,7 @@ public class GameGUI {
     private void render() {
         drawPolygon();
         drawCursor();
+        drawInfos();
     }
 
     public void run() {
@@ -299,5 +297,13 @@ public class GameGUI {
         } else {
             down = 0;
         }
+    }
+
+    private void drawInfos() {
+        Text.drawString("Nivel:", -8, 7.5f, 0.45f, 3f);
+        Text.drawString(Integer.toString(game.getLevel()), -4.5f, 7.5f, 0.45f, 1f);
+
+        Text.drawString("Lados:", 4, 7.5f, 0.45f, 3f);
+        Text.drawString(Integer.toString(game.getCount_edges()), 8f, 7.5f, 0.45f, 1f);
     }
 }

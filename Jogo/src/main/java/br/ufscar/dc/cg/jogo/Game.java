@@ -47,11 +47,15 @@ public class Game {
         int next_vertex = (i + 1) % polygon._poly.size();
         polygon._poly.get(next_vertex).color = new RGBColor(Point.DEFAULT_COLOR3);
         polygon._poly.get(next_vertex).state = PointState.USED;
-        count_edges += 2;
+        count_edges -= 1;
 
-        if (count_edges == polygon.size()) {
+        if (count_edges == 0) {
             state = GameState.NEXT_LEVEL;
         }
+    }
+
+    public int getCount_edges() {
+        return count_edges;
     }
 
     public void next_level() {
@@ -62,6 +66,6 @@ public class Game {
     void reset_level() {
         polygon = Polygon.generate(level + 2);
         state = GameState.PLAYING;
-        count_edges = 0;
+        count_edges = polygon.size() / 2;
     }
 }
