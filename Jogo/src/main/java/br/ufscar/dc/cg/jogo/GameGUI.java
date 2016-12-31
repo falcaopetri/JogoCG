@@ -20,6 +20,7 @@ public class GameGUI {
     private static final int SHOT_DEBOUNCE_DELAY = 200; // in milliseconds
     private static final double SHOT_INCREMENT = 0.09;
     private static double ROTATION_INCREMENT = 0.7;
+    private static double BASE_ROTATION_INCREMENT = 0.5;
 
     /* Status flags */
     private final boolean[] keyDown = new boolean[GLFW.GLFW_KEY_LAST];
@@ -70,6 +71,13 @@ public class GameGUI {
                 }
                 if (key == GLFW_KEY_R && action == GLFW_RELEASE) {
                     game.reset_level();
+                }
+                if (key == GLFW_KEY_LEFT_SHIFT) {
+                    if (action == GLFW_PRESS && !game.getCooldown().running) {
+                        game.getCooldown().start();
+                    } else if (action == GLFW_RELEASE) {
+                        game.getCooldown().stop();
+                    }
                 }
                 if (key == GLFW_KEY_Q && action == GLFW_RELEASE) {
                     if (ROTATION_INCREMENT < 0) {
@@ -202,7 +210,12 @@ public class GameGUI {
         }
 
         if (/*!shot &&*/game.getState() == GameState.PLAYING) {
-            rotate = (rotate + ROTATION_INCREMENT * (1 + game.getLevel() / 10)) % 360;
+            if (game.getCooldown().running) {
+                rotate = (rotate + BASE_ROTATION_INCREMENT) % 360;
+                System.out.println("holding");
+            } else {
+                rotate = (rotate + ROTATION_INCREMENT * (1 + game.getLevel() / 10)) % 360;
+            }
         }
 
     }
@@ -229,6 +242,7 @@ public class GameGUI {
         } catch (Throwable t) {
             t.printStackTrace();
         } finally {
+            game.getCooldown().timer.cancel();
             glfwTerminate();
             glfwSetErrorCallback(null).free();
         }
@@ -305,5 +319,8 @@ public class GameGUI {
 
         Text.drawString("Lados:", 4, 7.5f, 0.45f, 3f);
         Text.drawString(Integer.toString(game.getCount_edges()), 8f, 7.5f, 0.45f, 1f);
+
+        Text.drawString("Cooldown:", -8, -7f, 0.45f, 3f);
+        Text.drawString(String.format("%.2f", game.getCooldown().curr_value), -3f, -7f, 0.45f, 1f);
     }
 }
