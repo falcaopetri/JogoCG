@@ -142,12 +142,18 @@ public class GameGUI {
                     return;
                 }
 
-                if (scene == Scene.INSTRUCTIONS_1 && key == GLFW_KEY_N) {
+                else if (scene == Scene.INSTRUCTIONS_1) {
+                    if(key == GLFW_KEY_C)
                     scene = Scene.INSTRUCTIONS_2;
+                    if(key == GLFW_KEY_P)
+                        scene = Scene.HOME;
                 }
 
-                if (scene == Scene.INSTRUCTIONS_2 && key == GLFW_KEY_P) {
+                else if (scene == Scene.INSTRUCTIONS_2) {
+                    if(key == GLFW_KEY_P)
                     scene = Scene.INSTRUCTIONS_1;
+                    if(key == GLFW_KEY_C)
+                        scene = Scene.HOME;              
                 }
             }
         });
@@ -190,9 +196,20 @@ public class GameGUI {
         // the window or has pressed the ESCAPE key.
         while (!glfwWindowShouldClose(window)) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-
-            update();
-            render();
+             if (scene == Scene.GAME) {
+                update();
+                render();
+            } else if (scene == Scene.HOME) {
+                  drawHome();
+            } else if (scene == Scene.INSTRUCTIONS_1) {
+                  drawInstructions1();
+            } else if (scene == Scene.INSTRUCTIONS_2) {
+                    drawInstructions2();
+            } else if (scene == Scene.ABOUT) {
+                    drawAbout();
+            }
+            
+            
 
             glfwSwapBuffers(window); // swap the color buffers
 
@@ -313,25 +330,38 @@ public class GameGUI {
 
         glPopMatrix();
     }
-
+    private void drawHome(){
+            Text.drawString("$NOME", -2.5f, 3, 0.7f, 2f);
+            Text.drawString("s  to  start", -3f, -1f, 0.5f, 2f);
+            Text.drawString("c  to  controls", -3f, -3f, 0.5f, 2f);
+            Text.drawString("a  to  about", -3f, -5f, 0.5f, 2f);
+    }
+    private void drawInstructions1(){
+            Text.drawString("Teclas", -1.5f, 5, 0.6f, 2f);
+            Text.drawString("espaco                 tiro", -5.5f, 3, 0.5f, 1.5f);
+            Text.drawString("shift         modo  lento", -5.5f, 0, 0.5f, 1.5f);
+            Text.drawString("esq                   voltar", -5.5f, -2.5f, 0.5f, 1.5f);
+            Text.drawString("P   p r e vio u s        C   c o n tin u e", -8f, -7f, 0.42f, 1.3f);
+    }
+     private void drawInstructions2(){
+             Text.drawString("Objetivo", -2f, 5, 0.6f, 2f);
+             Text.drawString("Acerte todas as arestas", -6f, 2, 0.5f, 1.5f);
+             Text.drawString("uma unica vez", -6f, 0, 0.5f, 1.5f);
+             Text.drawString("P   p r e vio u s        C   c o n tin u e", -8f, -7f, 0.42f, 1.3f);
+    }
+     private void drawAbout(){
+              Text.drawString("About", -1.5f, 5, 0.6f, 2f);
+              Text.drawString("Trabalho  de  Computacao", -7f, 2, 0.5f, 1.5f);
+              Text.drawString("grafica    2016  UFS C a r ", -7f, 0, 0.5f, 1.5f);
+              Text.drawString("Anotino Falcao Petri", -7f, -4f, 0.5f, 1.5f);
+              Text.drawString("Thiago Yonamine", -7f, -6f, 0.5f, 1.5f);
+    }
     private void drawInfos() {
-        if (scene == Scene.GAME) {
-            Text.drawString("Nivel:", -8, 7.5f, 0.45f, 3f);
+        
+            Text.drawString("Niv el:", -8, 7.5f, 0.45f, 2f);
             Text.drawString(Integer.toString(game.getLevel()), -4.5f, 7.5f, 0.45f, 1f);
 
-            Text.drawString("Lados:", 4, 7.5f, 0.45f, 3f);
+            Text.drawString("La d o s:", 4, 7.5f, 0.45f, 2f);
             Text.drawString(Integer.toString(game.getCount_edges()), 8f, 7.5f, 0.45f, 1f);
-        } else if (scene == Scene.HOME) {
-            Text.drawString("$NOME", -2f, 1, 0.7f, 3f);
-            Text.drawString("(s)tart", -1, -3f, 0.5f, 3f);
-            Text.drawString("(c)ontrols", -1, -5f, 0.5f, 3f);
-            Text.drawString("(a)bout", -1, -7f, 0.5f, 3f);
-        } else if (scene == Scene.INSTRUCTIONS_1) {
-            Text.drawString("instructions 1", -2f, 1, 0.4f, 3f);
-        } else if (scene == Scene.INSTRUCTIONS_2) {
-            Text.drawString("instructions 2", -2f, 1, 0.4f, 3f);
-        } else if (scene == Scene.ABOUT) {
-            Text.drawString("about", -2f, 1, 0.7f, 3f);
-        }
-    }
+    }    
 }
