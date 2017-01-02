@@ -185,7 +185,8 @@ public class GameGUI {
                 }
             }*/
             int mi = pol.intersectAfterRotation(rotate);
-            System.out.println("intersects " + mi);
+            colide = pol.colide;
+            System.out.println(colide);
 
             game.do_move(mi);
 
@@ -283,9 +284,10 @@ public class GameGUI {
         glPopMatrix();
         if (shot) {
             down -= SHOT_INCREMENT;
-            //System.out.println(colide);
+            
+            System.out.println(down);
             //if (down < colide) {
-            if (down < -1) {
+            if (0.75+down < colide) {
                 shot = false; // trocar para colide
                 /*try {
                     Thread.sleep(10);
