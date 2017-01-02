@@ -11,6 +11,7 @@ import org.lwjgl.glfw.*;
 import org.lwjgl.openal.AL;
 import org.lwjgl.openal.ALC;
 import static br.ufscar.dc.cg.jogo.audio.OpenALInfo.checkALCError;
+import java.util.Random;
 import static org.lwjgl.openal.ALC10.*;
 import static org.lwjgl.openal.ALC11.*;
 import org.lwjgl.openal.ALCCapabilities;
@@ -48,6 +49,7 @@ public class GameGUI {
     private boolean shot = false;
     private boolean paint = false;
     private boolean sound_on = true;
+    private int som = 1;
     private double disparo;
     private double colide;
 
@@ -172,8 +174,8 @@ public class GameGUI {
         System.out.println("ALC_MONO_SOURCES: " + alcGetInteger(device, ALC_MONO_SOURCES));
         System.out.println("ALC_STEREO_SOURCES: " + alcGetInteger(device, ALC_STEREO_SOURCES));
 
-        audioTracks = new AudioTracks("test.ogg", "music.ogg");
-        audioTracks.play(1);
+        audioTracks = new AudioTracks("music.ogg","a.ogg","b.ogg","c.ogg","d.ogg","e.ogg","f.ogg","g.ogg");
+        audioTracks.play(0);
     }
 
     private void loop() {
@@ -216,7 +218,13 @@ public class GameGUI {
             paint = true;
             //play source 0
             if (sound_on) {
-                audioTracks.play(0);
+                Random gerador = new Random();
+                int numero = gerador.nextInt(6);
+                
+                audioTracks.play(numero+1);
+                //audioTracks.play(som);
+                som ++;
+                if(som >=7) som = 1;
             }
         }
 

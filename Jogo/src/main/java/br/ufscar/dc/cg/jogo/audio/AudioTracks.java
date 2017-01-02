@@ -88,6 +88,10 @@ public class AudioTracks {
     }
 
     public void play(int i) {
+        if(i>0)
+        alSourcef(sources.get(i), AL_GAIN, 0.5f);
+        else
+        alSourcef(sources.get(i), AL_GAIN, 1);
         alSourcePlay(sources.get(i));
         checkALError();
     }
