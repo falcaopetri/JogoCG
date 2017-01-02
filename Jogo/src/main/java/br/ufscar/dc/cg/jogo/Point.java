@@ -105,13 +105,13 @@ public class Point {
         return new Point(nx, ny);
     }
 
-    public static double rotationX(double x, double y, double ang) {
+    private static double rotationX(double x, double y, double ang) {
         double rad = ang * Math.PI / 180;
         double nx = cos(rad) * x + sin(rad) * -1 * y;
         return nx;
     }
 
-    public static double rotationY(double x, double y, double ang) {
+    private static double rotationY(double x, double y, double ang) {
         double rad = ang * Math.PI / 180;
         double ny = sin(rad) * x + cos(rad) * y;
         return ny;

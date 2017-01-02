@@ -1,3 +1,4 @@
+package br.ufscar.dc.cg;
 
 import br.ufscar.dc.cg.jogo.GameGUI;
 
