@@ -12,29 +12,36 @@ import static org.lwjgl.stb.STBVorbis.*;
 import org.lwjgl.stb.STBVorbisInfo;
 import static org.lwjgl.system.MemoryUtil.NULL;
 
-public class AudioTrack {
+public class AudioTracks {
 
-    int buffer;
-    int source;
+    IntBuffer buffers;
+    IntBuffer sources;
 
-    public AudioTrack(String path) {
-        buffer = alGenBuffers();
+    public AudioTracks(String... paths) {
+        buffers = BufferUtils.createIntBuffer(paths.length);
+        sources = BufferUtils.createIntBuffer(paths.length);
+
+        alGenBuffers(buffers);
         checkALError();
 
-        source = alGenSources();
+        alGenSources(sources);
         checkALError();
 
         try (STBVorbisInfo info = STBVorbisInfo.malloc()) {
-            ShortBuffer pcm = readVorbis(path, 32 * 1024, info);
+            for (int i = 0; i < paths.length; ++i) {
+                ShortBuffer pcm = readVorbis(paths[i], 32 * 1024, info);
 
-            //copy to buffer
-            alBufferData(buffer, info.channels() == 1 ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16, pcm, info.sample_rate());
-            checkALError();
+                //copy to buffer
+                alBufferData(buffers.get(i), info.channels() == 1 ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16, pcm, info.sample_rate());
+                checkALError();
+            }
         }
 
         //set up source input
-        alSourcei(source, AL_BUFFER, buffer);
-        checkALError();
+        for (int i = 0; i < paths.length; ++i) {
+            alSourcei(sources.get(i), AL_BUFFER, buffers.get(i));
+            checkALError();
+        }
 
         //lets loop the sound
         //alSourcei(source, AL_LOOPING, AL_TRUE);
@@ -43,11 +50,13 @@ public class AudioTrack {
 
     public void close() {
         //delete buffers and sources
-        alDeleteSources(source);
-        checkALError();
+        for (int i = 0; i < sources.capacity(); ++i) {
+            alDeleteSources(sources.get(i));
+            checkALError();
 
-        alDeleteBuffers(buffer);
-        checkALError();
+            alDeleteBuffers(buffers.get(i));
+            checkALError();
+        }
     }
 
     static ShortBuffer readVorbis(String resource, int bufferSize, STBVorbisInfo info) {
@@ -78,8 +87,8 @@ public class AudioTrack {
         return pcm;
     }
 
-    public void play() {
-        alSourcePlay(source);
+    public void play(int i) {
+        alSourcePlay(sources.get(i));
         checkALError();
     }
 

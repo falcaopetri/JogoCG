@@ -1,6 +1,6 @@
 package br.ufscar.dc.cg.jogo;
 
-import br.ufscar.dc.cg.jogo.audio.AudioTrack;
+import br.ufscar.dc.cg.jogo.audio.AudioTracks;
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.nio.IntBuffer;
@@ -37,7 +37,7 @@ public class GameGUI {
     long context;
     long device;
 
-    AudioTrack pew;
+    AudioTracks audioTracks;
 
     /* Status flags */
     private final boolean[] keyDown = new boolean[GLFW.GLFW_KEY_LAST];
@@ -85,9 +85,11 @@ public class GameGUI {
                     glfwSetWindowShouldClose(window, true);
                 }
                 if (key == GLFW_KEY_N && action == GLFW_RELEASE) {
+                    audioTracks.play(0);
                     game.next_level();
                 }
                 if (key == GLFW_KEY_R && action == GLFW_RELEASE) {
+                    audioTracks.play(1);
                     game.reset_level();
                 }
                 if (key == GLFW_KEY_S && action == GLFW_RELEASE) {
@@ -170,7 +172,7 @@ public class GameGUI {
         System.out.println("ALC_MONO_SOURCES: " + alcGetInteger(device, ALC_MONO_SOURCES));
         System.out.println("ALC_STEREO_SOURCES: " + alcGetInteger(device, ALC_STEREO_SOURCES));
 
-        pew = new AudioTrack("test.ogg");
+        audioTracks = new AudioTracks("test.ogg", "test.ogg");
     }
 
     private void loop() {
@@ -213,7 +215,7 @@ public class GameGUI {
             paint = true;
             //play source 0
             if (sound_on) {
-                pew.play();
+                audioTracks.play(0);
             }
         }
 
@@ -293,7 +295,7 @@ public class GameGUI {
         } finally {
             glfwTerminate();
 
-            pew.close();
+            audioTracks.close();
 
             alcDestroyContext(context);
             alcCloseDevice(device);
