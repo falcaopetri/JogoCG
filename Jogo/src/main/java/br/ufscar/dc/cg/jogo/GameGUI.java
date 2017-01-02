@@ -31,8 +31,6 @@ public class GameGUI {
     private double down = 0;
     private boolean shot = false;
     private boolean paint = false;
-    private double disparo;
-    private double colide;
 
     /* Callbacks*/
     private GLFWKeyCallback keyCallback;
@@ -156,52 +154,19 @@ public class GameGUI {
 
         if (paint) {
             Polygon pol = game.getPolygon();
-            /*int mi = 0;
-            double maior = -2;
-            for (int i = 0; i < pol._poly.size(); ++i) {
-                Point p = pol._poly.get(i);
-                double ny = Point.rotationY(p.getX(), p.getY(), rotate + 10);
-                if (disparo == maior) {
-                    colide = disparo;
-                    colide += ny;
-                    colide /= 2;
-                    colide = 1 - Math.abs(colide);
-                    colide *= -1;
-                    if (colide > -0.5) {
-                        colide = -0.5;
-                    }
-                }
-
-                if (maior <= ny) {
-                    maior = ny;
-                    double nx = Point.rotationX(p.getX(), p.getY(), rotate + 10);
-                    disparo = maior;// - Math.abs(nx)/2.0;
-                    if (nx > 0.8) {
-                        mi = i - 1;
-                    } else {
-                        mi = i;
-                    }
-
-                }
-            }*/
             int mi = pol.intersectAfterRotation(rotate);
             System.out.println("intersects " + mi);
 
-            game.do_move(mi);
-
+            pol._poly.get(mi).color = new RGBColor(Point.DEFAULT_COLOR3);
+            int next_vertex = (mi + 1) % pol._poly.size();
+            pol._poly.get(next_vertex).color = new RGBColor(Point.DEFAULT_COLOR3);
+            //System.out.println(mi);
             paint = false;
         }
 
-        if (game.getState() == GameState.NEXT_LEVEL) {
-            game.next_level();
-            double random = Math.random();
-            if (random < 0.5) {
-                ROTATION_ORIENTATION = -ROTATION_ORIENTATION;
-            }
-        }
-
-        if (/*!shot &&*/game.getState() == GameState.PLAYING) {
-            rotate = (rotate + ROTATION_ORIENTATION * (ROTATION_BASE_INCREMENT + ROTATION_INCREMENT) * (1 + game.getLevel() / 10)) % 360;
+        if (!shot && game.getState() == GameState.PLAYING) {
+            rotate += 0.7;
+            rotate = (rotate + 0.7f) % 360;
         }
 
     }
@@ -262,8 +227,8 @@ public class GameGUI {
             glColor3d(p.color.R, p.color.G, p.color.B);
             glVertex2d(p.getX(), p.getY());
         }
-        glEnd();
 
+        glEnd();
         for (Point p : pol._poly) {
             drawCircle(p.getX(), p.getY(), 0.01);
         }
