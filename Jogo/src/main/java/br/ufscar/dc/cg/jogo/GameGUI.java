@@ -196,7 +196,12 @@ public class GameGUI {
         // the window or has pressed the ESCAPE key.
         while (!glfwWindowShouldClose(window)) {
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // clear the framebuffer
-             if (scene == Scene.GAME) {
+            if(game.getState() == GameState.GAME_OVER){
+                game.reset();
+                shot = false;
+                scene = Scene.HOME;
+            }
+            else if (scene == Scene.GAME) {
                 update();
                 render();
             } else if (scene == Scene.HOME) {
