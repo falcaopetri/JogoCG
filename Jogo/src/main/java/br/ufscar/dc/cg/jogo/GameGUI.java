@@ -172,7 +172,8 @@ public class GameGUI {
         System.out.println("ALC_MONO_SOURCES: " + alcGetInteger(device, ALC_MONO_SOURCES));
         System.out.println("ALC_STEREO_SOURCES: " + alcGetInteger(device, ALC_STEREO_SOURCES));
 
-        audioTracks = new AudioTracks("test.ogg", "test.ogg");
+        audioTracks = new AudioTracks("test.ogg", "music.ogg");
+        audioTracks.play(1);
     }
 
     private void loop() {
