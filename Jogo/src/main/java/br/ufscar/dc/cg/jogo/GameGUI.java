@@ -250,19 +250,12 @@ public class GameGUI {
         glPopMatrix();
         if (shot) {
             down -= SHOT_INCREMENT;
-            
-            System.out.println(down);
-            //if (down < colide) {
-            if (0.75+down < colide) {
-                shot = false; // trocar para colide
-                /*try {
-                    Thread.sleep(10);
-                } catch (InterruptedException ex) {
-                    Thread.currentThread().interrupt();
-                }*/
+
+            if (0.75 + down < colide) {
+                shot = false;
             }
         } else {
-            down = 0;
+            down = Math.min(0, down + SHOT_INCREMENT);
         }
     }
 
