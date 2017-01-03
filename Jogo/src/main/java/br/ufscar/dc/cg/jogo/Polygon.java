@@ -5,6 +5,55 @@ import java.util.List;
 
 public class Polygon {
 
+    int intersectAfterRotation(double angle) {
+        int p = -1;
+        for (int i = 0; i < _poly.size(); i++) {
+            Point curr = this._poly.get(i).rotate(angle);
+            Point next = this._poly.get((i + 1) % _poly.size()).rotate(angle);
+
+            //System.out.println("doing a " + curr.getX() + " " + next.getX());
+            if (next.getX() < 0 && 0 <= curr.getX()) {
+               
+                double m = (next.getY() - curr.getY()) / (next.getX()-curr.getX());
+                //y  = m (x – x1) + y1.
+                colide = m*(0.0-curr.getX()) + curr.getY();
+                System.out.println("doing a " + curr.getY() + next.getY());
+                p = i;
+                break;
+            }
+        }
+
+        return p;
+    }
+
+    private Pair<Double, Double> min_max_angle(Point p) {
+        double angle_min = Double.MAX_VALUE;
+        double angle_max = Double.MIN_VALUE;
+
+        if (_poly.size() < 2) {
+            return new Pair<Double, Double>(angle_min, angle_max);
+        }
+
+        _poly.add(p);
+
+        for (int i = 0; i < _poly.size() + 1; ++i) {
+            Point p1 = _poly.get((i) % _poly.size());
+            Point p2 = _poly.get((i + 1) % _poly.size());
+            Point p3 = _poly.get((i + 2) % _poly.size());
+
+            Point v1 = new Point(p2);
+            v1.subtract(p1);
+            Point v2 = new Point(p3);
+            v2.subtract(p2);
+
+            angle_min = Math.min(angle_min, v1.angle(v2));
+            angle_max = Math.max(angle_max, v1.angle(v2));
+        }
+
+        _poly.remove(p);
+        return new Pair<Double, Double>(angle_min, angle_max);
+    }
+
     static public class ConvexHull2D {
         // Source: http://www.java-gaming.org/index.php?topic=522.0
         // Points is filled with points to test, then stripped down to minimal set when hull calcualted
@@ -18,7 +67,7 @@ public class Polygon {
             testedPoints = new ArrayList<>();
         }
 
-        public void addPoint(float x, float y) {
+        public void addPoint(double x, double y) {
             Point newPoint = new Point(x, y);
 
             points.add(newPoint);
@@ -62,7 +111,7 @@ public class Polygon {
                 // March around the edge. Finish when we get back to where we started
                 while (true) {
                     // Find next point with largest right turn relative to current
-                    float currentAngle = 181f;
+                    double currentAngle = 181f;
                     for (int i = 0; i < points.size(); i++) {
                         Point testPoint = (Point) points.get(i);
 
@@ -71,7 +120,7 @@ public class Polygon {
                         testDirection.subtract(currentPoint);
                         testDirection.normalise();
 
-                        float testAngle = currentDirection.angle(testDirection);
+                        double testAngle = currentDirection.angle(testDirection);
 
                         // Update next point with test if smaller angle
                         if (testAngle < currentAngle) {
@@ -111,18 +160,31 @@ public class Polygon {
     List<Point> _poly;
     List<Boolean> _edges_states;
     Point _gravity_center;
+    double colide;
 
     private static Polygon generateFromRandomPoints(int n) {
+        int tries_left = 5000;
         Polygon poly = new Polygon();
+        Pair<Double, Double> angle_pair;
         for (int i = 0; i < n; ++i) {
             Point p;
+
             do {
-                p = Point.random(1.0f, 1.0f);
-            } while (poly.is_inside(p));
+                if (tries_left == 0) {
+                    throw new InstantiationError("too many tries");
+                }
+                p = Point.random(1.2, 1.2);
+                angle_pair = poly.min_max_angle(p);
+
+                tries_left--;
+
+            } while (poly.is_inside(p) || p.min_distance(poly._poly) < 0.07 || angle_pair.getFirst() < 0.35/* || angle_pair.getSecond() > 2.5*/);
+            System.out.println("angle: " + angle_pair);
             poly.add(p);
 
             poly.ccw_sort();
         }
+        System.out.println("");
 
         ConvexHull2D ch = new ConvexHull2D();
         for (Point tmp : poly._poly) {
@@ -133,18 +195,33 @@ public class Polygon {
         poly = new Polygon();
         for (Point p : ch.points) {
             poly.add(p);
-           
-            // TODO duplica vértices
-            //Point p_dup = new Point(p.getX()+ 0.01f*p.getX() , p.getY()+ 0.01f*p.getY());
-            //poly.add(p_dup);
+            Point p_dup = new Point(p);
+            poly.add(p_dup);
         }
+
+        poly.bringCenterToOrigin();
+
         return poly;
     }
 
     public Polygon() {
         //_poly = new java.awt.Polygon();
-        _poly = new ArrayList<Point>();
+        _poly = new ArrayList<>();
         _edges_states = new ArrayList<>();
+    }
+
+    public void bringCenterToOrigin() {
+        List<Point> new_poly = new ArrayList<>();
+        for (Point p : _poly) {
+            new_poly.add(new Point(p.getX() - _gravity_center.getX(), p.getY() - _gravity_center.getY()));
+        }
+        _poly = new_poly;
+        calculate_gravity_center();
+
+        // TODO era pra esse assert valer? (porque ele não está valendo)
+        /*if (_gravity_center.getX() != _gravity_center.getY() || _gravity_center.getX() != 0) {
+            throw new AssertionError();
+        }*/
     }
 
     public static Polygon generate(int n) {
@@ -158,8 +235,8 @@ public class Polygon {
     }
 
     private static Polygon generateFromCircle(int n) {
-        /*float xs[] = new float[n];
-        float ys[] = new float[n];*/
+        /*double xs[] = new double[n];
+        double ys[] = new double[n];*/
         ArrayList<Float> xs = new ArrayList<>();
         ArrayList<Float> ys = new ArrayList<>();
 
@@ -169,20 +246,20 @@ public class Polygon {
         for (int i = 0; i < n; ++i) {
             angles[i] = Math.random() * 2 * Math.PI;
         }
-        float xs2[] = new float[n];
-        float ys2[] = new float[n];
+        double xs2[] = new double[n];
+        double ys2[] = new double[n];
         for (int i = 0; i < n; i++) {
             x = x0 + r * Math.cos(angles[i]);
             y = y0 + r * Math.sin(angles[i]);
-            xs2[i] = (float) x;
-            ys2[i] = (float) y;
+            xs2[i] = (double) x;
+            ys2[i] = (double) y;
         }
         return Polygon.create(xs2, ys2);
     }
 
     private static Polygon generateLikeACircle(int n) {
-        /*float xs[] = new float[n];
-        float ys[] = new float[n];*/
+        /*double xs[] = new double[n];
+        double ys[] = new double[n];*/
         ArrayList<Float> xs = new ArrayList<>();
         ArrayList<Float> ys = new ArrayList<>();
 
@@ -202,8 +279,8 @@ public class Polygon {
             ys.add(new Float(y));
         }
 
-        float xs2[] = new float[xs.size()];
-        float ys2[] = new float[xs.size()];
+        double xs2[] = new double[xs.size()];
+        double ys2[] = new double[xs.size()];
 
         for (int i = 0; i < xs.size(); ++i) {
             xs2[i] = xs.get(i);
@@ -213,7 +290,7 @@ public class Polygon {
         return Polygon.create(xs2, ys2);
     }
 
-    public static Polygon create(float x[], float y[]) {
+    public static Polygon create(double x[], double y[]) {
         if (x.length != y.length) {
             throw new IllegalArgumentException();
         }
@@ -222,15 +299,15 @@ public class Polygon {
 
         for (int i = 0; i < x.length; ++i) {
             p.add(x[i], y[i]);
-            
+
         }
 
         return p;
     }
 
-    public void add(float x, float y) {
+    public void add(double x, double y) {
         add(new Point(x, y));
-        
+
     }
 
     public void add(Point p) {
@@ -296,8 +373,8 @@ public class Polygon {
     }
 
     private Point calculate_gravity_center_mean() {
-        float x_sum = 0;
-        float y_sum = 0;
+        double x_sum = 0;
+        double y_sum = 0;
 
         for (Point p : _poly) {
             x_sum += p.getX();
@@ -308,11 +385,11 @@ public class Polygon {
     }
 
     private Point calculate_gravity_center_centroid() {
-        float twicearea = 0;
-        float x = 0;
-        float y = 0;
+        double twicearea = 0;
+        double x = 0;
+        double y = 0;
         Point p1, p2;
-        float f;
+        double f;
         Point off = _poly.get(0);
         for (int i = 0, j = _poly.size() - 1; i < _poly.size(); j = i++) {
             p1 = _poly.get(i);
