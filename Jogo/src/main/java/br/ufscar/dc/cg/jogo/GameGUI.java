@@ -25,6 +25,7 @@ public class GameGUI {
     private Scene scene;
     private final Game game;
     private final Polygon arrow;
+    private static final Random gerador = new Random();
 
     private long window;
     private static final int WIDTH = 600;
@@ -174,7 +175,9 @@ public class GameGUI {
             private void processInstructionsKeys(int key, int action) {
                 if (action != GLFW_RELEASE) {
                     return;
-                } else if (scene == Scene.INSTRUCTIONS_1) {
+                }
+
+                if (scene == Scene.INSTRUCTIONS_1) {
                     if (key == GLFW_KEY_C) {
                         scene = Scene.INSTRUCTIONS_2;
                     }
@@ -249,6 +252,12 @@ public class GameGUI {
 //        System.out.println("ALC_MONO_SOURCES: " + alcGetInteger(device, ALC_MONO_SOURCES));
 //        System.out.println("ALC_STEREO_SOURCES: " + alcGetInteger(device, ALC_STEREO_SOURCES));
         audioTracks = new AudioTracks("music.ogg", "a.ogg", "b.ogg", "c.ogg", "d.ogg", "e.ogg", "f.ogg", "g.ogg");
+
+        audioTracks.setGain(0, 1);
+        for (int i = 1; i < 8; ++i) {
+            audioTracks.setGain(i, 0.5f);
+        }
+        audioTracks.setToLoop(0);
         audioTracks.play(0);
     }
 
@@ -302,7 +311,6 @@ public class GameGUI {
 
             //play source 0
             if (sound_on) {
-                Random gerador = new Random();
                 int numero = gerador.nextInt(6);
 
                 audioTracks.play(numero + 1);
