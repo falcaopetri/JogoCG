@@ -31,6 +31,7 @@ public class GameGUI {
     private double down = 0;
     private boolean shot = false;
     private boolean paint = false;
+    private double colide;
 
     /* Callbacks*/
     private GLFWKeyCallback keyCallback;
@@ -155,7 +156,8 @@ public class GameGUI {
         if (paint) {
             Polygon pol = game.getPolygon();
             int mi = pol.intersectAfterRotation(rotate);
-            System.out.println("intersects " + mi);
+            colide = pol.colide;
+            System.out.println(colide);
 
             pol._poly.get(mi).color = new RGBColor(Point.DEFAULT_COLOR3);
             int next_vertex = (mi + 1) % pol._poly.size();
@@ -248,9 +250,10 @@ public class GameGUI {
         glPopMatrix();
         if (shot) {
             down -= SHOT_INCREMENT;
-            //System.out.println(colide);
+            
+            System.out.println(down);
             //if (down < colide) {
-            if (down < -1) {
+            if (0.75+down < colide) {
                 shot = false; // trocar para colide
                 /*try {
                     Thread.sleep(10);

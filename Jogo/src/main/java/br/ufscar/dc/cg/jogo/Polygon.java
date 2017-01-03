@@ -11,8 +11,13 @@ public class Polygon {
             Point curr = this._poly.get(i).rotate(angle);
             Point next = this._poly.get((i + 1) % _poly.size()).rotate(angle);
 
-            System.out.println("doing a " + curr.getX() + " " + next.getX());
+            //System.out.println("doing a " + curr.getX() + " " + next.getX());
             if (next.getX() < 0 && 0 <= curr.getX()) {
+               
+                double m = (next.getY() - curr.getY()) / (next.getX()-curr.getX());
+                //y  = m (x – x1) + y1.
+                colide = m*(0.0-curr.getX()) + curr.getY();
+                System.out.println("doing a " + curr.getY() + next.getY());
                 p = i;
                 break;
             }
@@ -155,6 +160,7 @@ public class Polygon {
     List<Point> _poly;
     List<Boolean> _edges_states;
     Point _gravity_center;
+    double colide;
 
     private static Polygon generateFromRandomPoints(int n) {
         int tries_left = 5000;
