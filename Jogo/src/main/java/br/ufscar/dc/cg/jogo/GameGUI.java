@@ -1,8 +1,21 @@
 package br.ufscar.dc.cg.jogo;
 
+import br.ufscar.dc.cg.jogo.audio.AudioTracks;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.IntBuffer;
+import java.util.List;
 import static org.lwjgl.glfw.GLFW.*;
 import org.lwjgl.glfw.*;
+import org.lwjgl.openal.AL;
+import org.lwjgl.openal.ALC;
+import static br.ufscar.dc.cg.jogo.audio.OpenALInfo.checkALCError;
+import java.util.Random;
+import static org.lwjgl.openal.ALC10.*;
+import static org.lwjgl.openal.ALC11.*;
+import org.lwjgl.openal.ALCCapabilities;
+import org.lwjgl.openal.ALUtil;
+import static org.lwjgl.openal.EXTThreadLocalContext.alcSetThreadContext;
 import org.lwjgl.opengl.GL;
 import static org.lwjgl.opengl.GL11.*;
 import static org.lwjgl.system.MemoryUtil.*;
@@ -22,12 +35,18 @@ public class GameGUI {
     private static int ROTATION_ORIENTATION = 1;
     private static final double ROTATION_BASE_INCREMENT = 0.5;
 
+    long context;
+    long device;
+
+    AudioTracks audioTracks;
+
     /* Status flags */
     private boolean spaceKeyDown = false;
     private long lastShotTime = 0L;
     private double rotate = 1;
     private double down = 0;
     private boolean shot = false;
+    private boolean sound_on = true;
     private double colide;
 
     /* Callbacks*/
@@ -73,7 +92,6 @@ public class GameGUI {
                         game.reset();
                     }
                 }
-
                 switch (scene) {
                     case GAME:
                         processGameKeys(key, action);
@@ -128,6 +146,21 @@ public class GameGUI {
                 if (action != GLFW_RELEASE) {
                     return;
                 }
+                if (key == GLFW_KEY_N && action == GLFW_RELEASE) {
+                    audioTracks.play(0);
+                    game.next_level();
+                }
+                if (key == GLFW_KEY_R && action == GLFW_RELEASE) {
+                    audioTracks.play(1);
+                    game.reset_level();
+                }
+                if (key == GLFW_KEY_O && action == GLFW_RELEASE) {
+                    sound_on = !sound_on;
+                }
+                if (key == GLFW_KEY_Q && action == GLFW_RELEASE) {
+                    ROTATION_ORIENTATION = -ROTATION_ORIENTATION;
+                    ROTATION_INCREMENT += 0.1;
+                }
 
                 if (key == GLFW_KEY_S) {
                     scene = Scene.GAME;
@@ -180,6 +213,43 @@ public class GameGUI {
         // Make the window visible
         glfwShowWindow(window);
 
+        device = alcOpenDevice((ByteBuffer) null);
+        if (device == NULL) {
+            throw new IllegalStateException("Failed to open the default device.");
+        }
+
+        ALCCapabilities deviceCaps = ALC.createCapabilities(device);
+
+//        assertTrue(deviceCaps.OpenALC10);
+//        System.out.println("OpenALC10: " + deviceCaps.OpenALC10);
+//        System.out.println("OpenALC11: " + deviceCaps.OpenALC11);
+//        System.out.println("caps.ALC_EXT_EFX = " + deviceCaps.ALC_EXT_EFX);
+        if (deviceCaps.OpenALC11) {
+            List<String> devices = ALUtil.getStringList(NULL, ALC_ALL_DEVICES_SPECIFIER);
+            if (devices == null) {
+                checkALCError(NULL);
+            } else {
+//                for (int i = 0; i < devices.size(); i++) {
+//                    System.out.println(i + ": " + devices.get(i));
+//                }
+            }
+        }
+
+        String defaultDeviceSpecifier = alcGetString(NULL, ALC_DEFAULT_DEVICE_SPECIFIER);
+//        assertTrue(defaultDeviceSpecifier != null);
+//        System.out.println("Default device: " + defaultDeviceSpecifier);
+
+        context = alcCreateContext(device, (IntBuffer) null);
+        alcSetThreadContext(context);
+        AL.createCapabilities(deviceCaps);
+
+//        System.out.println("ALC_FREQUENCY: " + alcGetInteger(device, ALC_FREQUENCY) + "Hz");
+//        System.out.println("ALC_REFRESH: " + alcGetInteger(device, ALC_REFRESH) + "Hz");
+//        System.out.println("ALC_SYNC: " + (alcGetInteger(device, ALC_SYNC) == ALC_TRUE));
+//        System.out.println("ALC_MONO_SOURCES: " + alcGetInteger(device, ALC_MONO_SOURCES));
+//        System.out.println("ALC_STEREO_SOURCES: " + alcGetInteger(device, ALC_STEREO_SOURCES));
+        audioTracks = new AudioTracks("music.ogg", "a.ogg", "b.ogg", "c.ogg", "d.ogg", "e.ogg", "f.ogg", "g.ogg");
+        audioTracks.play(0);
     }
 
     private void loop() {
@@ -229,6 +299,14 @@ public class GameGUI {
             lastShotTime = thisTime;
             shot = true;
             spaceKeyDown = false;
+
+            //play source 0
+            if (sound_on) {
+                Random gerador = new Random();
+                int numero = gerador.nextInt(6);
+
+                audioTracks.play(numero + 1);
+            }
 
             // do shot
             Polygon pol = game.getPolygon();
@@ -281,6 +359,11 @@ public class GameGUI {
             t.printStackTrace();
         } finally {
             glfwTerminate();
+
+            audioTracks.close();
+
+            alcDestroyContext(context);
+            alcCloseDevice(device);
             glfwSetErrorCallback(null).free();
         }
     }
@@ -318,7 +401,6 @@ public class GameGUI {
         for (Point p : pol._poly) {
             drawCircle(p.getX(), p.getY(), 0.01);
         }
-
         glPopMatrix();
     }
 
