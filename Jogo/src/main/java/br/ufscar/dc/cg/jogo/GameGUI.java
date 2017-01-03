@@ -138,7 +138,7 @@ public class GameGUI {
                         break;
                     case GLFW_KEY_LEFT_SHIFT:
                         if (action == GLFW_PRESS && !game.getCooldown().running) {
-                            //ROTATION_ORIENTATION = -ROTATION_ORIENTATION;
+                            ROTATION_ORIENTATION = -ROTATION_ORIENTATION;
                             game.getCooldown().start();
                         } else if (action == GLFW_RELEASE) {
                             game.getCooldown().stop();

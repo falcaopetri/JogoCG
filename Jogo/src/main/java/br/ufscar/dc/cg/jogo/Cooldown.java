@@ -28,7 +28,7 @@ public class Cooldown {
     public synchronized boolean hasReset() {
         boolean prev = event_has_reset;
         event_has_reset = false;
-        return false;
+        return prev;
     }
 
     void stop() {
