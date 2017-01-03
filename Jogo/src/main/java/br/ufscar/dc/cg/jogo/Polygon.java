@@ -11,13 +11,11 @@ public class Polygon {
             Point curr = this._poly.get(i).rotate(angle);
             Point next = this._poly.get((i + 1) % _poly.size()).rotate(angle);
 
-            //System.out.println("doing a " + curr.getX() + " " + next.getX());
             if (next.getX() < 0 && 0 <= curr.getX()) {
-               
-                double m = (next.getY() - curr.getY()) / (next.getX()-curr.getX());
+
+                double m = (next.getY() - curr.getY()) / (next.getX() - curr.getX());
                 //y  = m (x – x1) + y1.
-                colide = m*(0.0-curr.getX()) + curr.getY();
-                System.out.println("doing a " + curr.getY() + next.getY());
+                colide = m * (0.0 - curr.getX()) + curr.getY();
                 p = i;
                 break;
             }
@@ -54,108 +52,6 @@ public class Polygon {
         return new Pair<Double, Double>(angle_min, angle_max);
     }
 
-    static public class ConvexHull2D {
-        // Source: http://www.java-gaming.org/index.php?topic=522.0
-        // Points is filled with points to test, then stripped down to minimal set when hull calcualted
-
-        private ArrayList<Point> points;
-
-        private ArrayList<Point> testedPoints;
-
-        public ConvexHull2D() {
-            points = new ArrayList<>();
-            testedPoints = new ArrayList<>();
-        }
-
-        public void addPoint(double x, double y) {
-            Point newPoint = new Point(x, y);
-
-            points.add(newPoint);
-        }
-
-        public void clear() {
-            points.clear();
-        }
-
-        public void calculateHull() {
-            if (points.size() > 0) {
-                // Holds the points of the calculated hull
-                ArrayList hullPoints = new ArrayList();
-
-                // First find an extreme point guranteed to be on the hull
-                // Start from the first point and compare all others for minimal y coord
-                Point startPoint = points.get(0);
-
-                for (int i = 0; i < points.size(); i++) {
-                    Point testPoint = (Point) points.get(i);
-
-                    // Find lowest y, and lowest x if equal y values.
-                    if (testPoint.getY() < startPoint.getY()) {
-                        startPoint = testPoint;
-                    } else if (testPoint.getY() == startPoint.getY()) {
-                        if (testPoint.getX() < startPoint.getX()) {
-                            startPoint = testPoint;
-                        }
-                    }
-                }
-
-                // Add the start point
-                hullPoints.add(startPoint);
-
-                Point currentPoint = startPoint;
-                Point currentDirection = new Point(1.0f, 0.0f);
-                Point nextPoint = null;
-
-                int debug = 0;
-
-                // March around the edge. Finish when we get back to where we started
-                while (true) {
-                    // Find next point with largest right turn relative to current
-                    double currentAngle = 181f;
-                    for (int i = 0; i < points.size(); i++) {
-                        Point testPoint = (Point) points.get(i);
-
-                        // Find angle between test and current points
-                        Point testDirection = new Point(testPoint);
-                        testDirection.subtract(currentPoint);
-                        testDirection.normalise();
-
-                        double testAngle = currentDirection.angle(testDirection);
-
-                        // Update next point with test if smaller angle
-                        if (testAngle < currentAngle) {
-                            currentAngle = testAngle;
-                            nextPoint = testPoint;
-                        } else if (testAngle == currentAngle) {
-                            // take point furthest away from current
-                            if (currentPoint.distanceTo(testPoint) > currentPoint.distanceTo(nextPoint)) {
-                                nextPoint = testPoint;
-                            }
-                        }
-                    }
-
-                    // Exit?
-                    if (nextPoint == hullPoints.get(0) || debug > 1000) {
-                        break;
-                    }
-
-                    // Add and advance
-                    hullPoints.add(nextPoint);
-
-                    currentDirection.set(nextPoint);
-                    currentDirection.subtract(currentPoint);
-
-                    currentPoint = nextPoint;
-                    nextPoint = null;
-
-                    debug++;
-                }
-
-                points = hullPoints;
-
-            } // fi points>0
-        }
-    }
     //java.awt.Polygon _poly;
     List<Point> _poly;
     List<Boolean> _edges_states;
@@ -163,45 +59,39 @@ public class Polygon {
     double colide;
 
     private static Polygon generateFromRandomPoints(int n) {
-        int tries_left = 5000;
+        int tries_left = 100000;
         Polygon poly = new Polygon();
-        Pair<Double, Double> angle_pair;
+        Pair<Double, Double> angle_pair = null;
+
         for (int i = 0; i < n; ++i) {
-            Point p;
+            Point p = null;
 
             do {
                 if (tries_left == 0) {
-                    throw new InstantiationError("too many tries");
+                    //    throw new InstantiationError("too many tries");
+                    break;
                 }
-                p = Point.random(1.2, 1.2);
+                p = Point.random(1.25, 1.25);
                 angle_pair = poly.min_max_angle(p);
 
                 tries_left--;
 
-            } while (poly.is_inside(p) || p.min_distance(poly._poly) < 0.07 || angle_pair.getFirst() < 0.35/* || angle_pair.getSecond() > 2.5*/);
+            } while (p.min_distance(poly._poly) < 0.1 || angle_pair.getFirst() < 0.35 || poly.is_inside(p)/* || angle_pair.getSecond() > 2.7*/);
             System.out.println("angle: " + angle_pair);
             poly.add(p);
-
-            poly.ccw_sort();
         }
-        System.out.println("");
+        System.out.println();
 
-        ConvexHull2D ch = new ConvexHull2D();
-        for (Point tmp : poly._poly) {
-            ch.addPoint(tmp.getX(), tmp.getY());
-        }
-        ch.calculateHull();
-
-        poly = new Polygon();
-        for (Point p : ch.points) {
-            poly.add(p);
+        Polygon new_poly = new Polygon();
+        for (Point p : ConvexHull2D.calculateHull(poly._poly)) {
+            new_poly.add(p);
             Point p_dup = new Point(p);
-            poly.add(p_dup);
+            new_poly.add(p_dup);
         }
 
-        poly.bringCenterToOrigin();
+        new_poly.bringCenterToOrigin();
 
-        return poly;
+        return new_poly;
     }
 
     public Polygon() {
@@ -338,13 +228,10 @@ public class Polygon {
     }
 
     private boolean is_inside_convex_hull(Point p) {
-        ConvexHull2D ch = new ConvexHull2D();
-        for (Point tmp : _poly) {
-            ch.addPoint(tmp.getX(), tmp.getY());
-        }
-        ch.addPoint(p.getX(), p.getY());
-        ch.calculateHull();
-        return ch.points.size() == this.size();
+        List<Point> points = new ArrayList<>(_poly);
+        points.add(p);
+
+        return ConvexHull2D.calculateHull(points).size() == this.size() + 1;
     }
 
     private boolean is_inside_maratona(Point p) {
@@ -360,13 +247,7 @@ public class Polygon {
         return c;
     }
 
-    private void ccw_sort() {
-        // TODO
-        // throw new UnsupportedOperationException("Not supported yet."); 
-    }
-
     private void calculate_gravity_center() {
-        // TODO calcula o centro de massa dos pontos, e não do polígono em si
         // read: https://en.wikipedia.org/wiki/Centroid#Centroid_of_polygon
         // _gravity_center =  calculate_gravity_center_mean();
         _gravity_center = calculate_gravity_center_centroid();
@@ -385,6 +266,8 @@ public class Polygon {
     }
 
     private Point calculate_gravity_center_centroid() {
+        // Source: http://stackoverflow.com/a/33852627
+
         double twicearea = 0;
         double x = 0;
         double y = 0;
