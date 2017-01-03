@@ -136,6 +136,15 @@ public class GameGUI {
                             }
                         }
                         break;
+                    case GLFW_KEY_LEFT_SHIFT:
+                        if (action == GLFW_PRESS && !game.getCooldown().running) {
+                            ROTATION_ORIENTATION = -ROTATION_ORIENTATION;
+                            game.getCooldown().start();
+                        } else if (action == GLFW_RELEASE) {
+                            ROTATION_ORIENTATION = -ROTATION_ORIENTATION;
+                            game.getCooldown().stop();
+                        }
+                        break;
                     case GLFW_KEY_SPACE:
                         if (game.getState() == GameState.PLAYING) {
                             spaceKeyDown = (action == GLFW_PRESS);
@@ -150,15 +159,12 @@ public class GameGUI {
                 if (key == GLFW_KEY_N && action == GLFW_RELEASE) {
                     audioTracks.play(0);
                     game.next_level();
-                }
-                if (key == GLFW_KEY_R && action == GLFW_RELEASE) {
+                } else if (key == GLFW_KEY_R && action == GLFW_RELEASE) {
                     audioTracks.play(1);
                     game.reset_level();
-                }
-                if (key == GLFW_KEY_O && action == GLFW_RELEASE) {
+                } else if (key == GLFW_KEY_O && action == GLFW_RELEASE) {
                     sound_on = !sound_on;
-                }
-                if (key == GLFW_KEY_Q && action == GLFW_RELEASE) {
+                } else if (key == GLFW_KEY_Q && action == GLFW_RELEASE) {
                     ROTATION_ORIENTATION = -ROTATION_ORIENTATION;
                     ROTATION_INCREMENT += 0.1;
                 }
@@ -170,6 +176,7 @@ public class GameGUI {
                 } else if (key == GLFW_KEY_C) {
                     scene = Scene.INSTRUCTIONS_1;
                 }
+
             }
 
             private void processInstructionsKeys(int key, int action) {
@@ -238,7 +245,7 @@ public class GameGUI {
             }
         }
 
-        String defaultDeviceSpecifier = alcGetString(NULL, ALC_DEFAULT_DEVICE_SPECIFIER);
+//        String defaultDeviceSpecifier = alcGetString(NULL, ALC_DEFAULT_DEVICE_SPECIFIER);
 //        assertTrue(defaultDeviceSpecifier != null);
 //        System.out.println("Default device: " + defaultDeviceSpecifier);
 
@@ -333,8 +340,11 @@ public class GameGUI {
         }
 
         if (game.getState() == GameState.PLAYING) {
-            // orientação * velocidade * taxa
-            rotate += ROTATION_ORIENTATION * (ROTATION_BASE_INCREMENT + ROTATION_INCREMENT) * (1 + game.getLevel() / 30);
+            if (game.getCooldown().running) {
+                rotate += ROTATION_ORIENTATION * ROTATION_BASE_INCREMENT;
+            } else {
+                rotate += ROTATION_ORIENTATION * (ROTATION_BASE_INCREMENT + ROTATION_INCREMENT) * (1 + game.getLevel() / 30);
+            }
             rotate %= 360;
         }
 
@@ -366,6 +376,7 @@ public class GameGUI {
         } catch (Throwable t) {
             t.printStackTrace();
         } finally {
+            game.getCooldown().timer.cancel();
             glfwTerminate();
 
             audioTracks.close();
@@ -464,5 +475,8 @@ public class GameGUI {
 
         Text.drawString("La d o s:", 4, 7.5f, 0.45f, 2f);
         Text.drawString(Integer.toString(game.getCount_edges()), 8f, 7.5f, 0.45f, 1f);
+
+        Text.drawString("Cooldown:", -8, -7f, 0.45f, 3f);
+        Text.drawString(String.format("%.2f", game.getCooldown().curr_value), -3f, -7f, 0.45f, 1f);
     }
 }

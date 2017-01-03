@@ -6,6 +6,7 @@ public class Game {
     private Polygon polygon;
     private int count_edges;
     private GameState state;
+    private Cooldown cooldown;
 
     public int getLevel() {
         return level;
@@ -28,11 +29,17 @@ public class Game {
     }
 
     public Game() {
+        cooldown = new Cooldown(1, 0.1);
         reset();
+    }
+
+    public Cooldown getCooldown() {
+        return cooldown;
     }
 
     public void reset() {
         level = 1;
+        cooldown.reset();
         reset_level();
     }
 
