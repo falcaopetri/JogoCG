@@ -21,7 +21,7 @@ public class Cooldown {
         this.event_has_reset = false;
 
         timer = new Timer();
-        timer.schedule(new CooldownTask(), 0, 100);
+        timer.schedule(new CooldownTask(), 0, 500);
         reset();
     }
 

@@ -138,13 +138,9 @@ public class GameGUI {
                         break;
                     case GLFW_KEY_LEFT_SHIFT:
                         if (action == GLFW_PRESS && !game.getCooldown().running) {
-                            //ROTATION_ORIENTATION = -ROTATION_ORIENTATION;
                             game.getCooldown().start();
                         } else if (action == GLFW_RELEASE) {
                             game.getCooldown().stop();
-                            if (game.getCooldown().hasReset()) {
-                                ROTATION_ORIENTATION = -ROTATION_ORIENTATION;
-                            }
                         }
                         break;
                     case GLFW_KEY_SPACE:
@@ -341,14 +337,10 @@ public class GameGUI {
         }
 
         if (game.getState() == GameState.PLAYING) {
-//            if (game.getCooldown().running) {
-//                rotate += ROTATION_ORIENTATION * ROTATION_BASE_INCREMENT;
-//            } else 
-            if (game.getCooldown().hasReset()) {
-                ROTATION_ORIENTATION = -ROTATION_ORIENTATION;
-            }
-            {
-                rotate += ROTATION_ORIENTATION * (ROTATION_BASE_INCREMENT + ROTATION_INCREMENT) * (1 + game.getLevel() / 30) * (game.getCooldown().curr_value + 0.2);
+            if (game.getCooldown().running) {
+                rotate += ROTATION_ORIENTATION * ROTATION_BASE_INCREMENT;
+            } else {
+                rotate += ROTATION_ORIENTATION * (ROTATION_BASE_INCREMENT + ROTATION_INCREMENT) * (1 + game.getLevel() / 30);
             }
             rotate %= 360;
         }

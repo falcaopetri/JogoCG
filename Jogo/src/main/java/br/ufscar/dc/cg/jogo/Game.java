@@ -29,7 +29,7 @@ public class Game {
     }
 
     public Game() {
-        cooldown = new Cooldown(1, 0.10);
+        cooldown = new Cooldown(1, 0.20);
         reset();
     }
 
