@@ -73,7 +73,7 @@ public class GameGUI {
         glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE); // the window will be resizable
 
         // Create the window
-        window = glfwCreateWindow(WIDTH, HEIGHT, "$NOME", NULL, NULL);
+        window = glfwCreateWindow(WIDTH, HEIGHT, "Touch", NULL, NULL);
         if (window == NULL) {
             throw new RuntimeException("Failed to create the GLFW window");
         }
@@ -348,7 +348,7 @@ public class GameGUI {
                 ROTATION_ORIENTATION = -ROTATION_ORIENTATION;
             }
             {
-                rotate += ROTATION_ORIENTATION * (ROTATION_BASE_INCREMENT + ROTATION_INCREMENT) * (1 + game.getLevel() / 30) * (game.getCooldown().curr_value + 0.2);
+                rotate += ROTATION_ORIENTATION * (ROTATION_BASE_INCREMENT + ROTATION_INCREMENT) * (1 + game.getLevel() / 20) * (game.getCooldown().curr_value + 0.2);
             }
             rotate %= 360;
         }
@@ -444,7 +444,7 @@ public class GameGUI {
     }
 
     private void drawHome() {
-        Text.drawString("$NOME", -2.5f, 3, 0.7f, 2f);
+        Text.drawString("Touch", -2f, 3, 0.7f, 2f);
         Text.drawString("s  to  start", -3f, -1f, 0.5f, 2f);
         Text.drawString("c  to  controls", -3f, -3f, 0.5f, 2f);
         Text.drawString("a  to  about", -3f, -5f, 0.5f, 2f);
@@ -481,7 +481,7 @@ public class GameGUI {
         Text.drawString("La d o s:", 4, 7.5f, 0.45f, 2f);
         Text.drawString(Integer.toString(game.getCount_edges()), 8f, 7.5f, 0.45f, 1f);
 
-        Text.drawString("Cooldown:", -8, -7f, 0.45f, 3f);
-        Text.drawString(String.format("%.2f", game.getCooldown().curr_value), -3f, -7f, 0.45f, 1f);
+        Text.drawString("Coold ow n:", -8, -7f, 0.45f, 1.5f);
+        Text.drawString(String.format("%.2f", game.getCooldown().curr_value), -2.0f, -7f, 0.45f, 1f);
     }
 }
