@@ -344,4 +344,5 @@ public class Text {
         GL11.glDisable(GL11.GL_LINE_WIDTH);
     }
 
+
 }

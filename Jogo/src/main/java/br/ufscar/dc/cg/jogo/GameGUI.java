@@ -49,6 +49,7 @@ public class GameGUI {
     private boolean shot = false;
     private boolean sound_on = true;
     private double colide;
+    private int Mscore = 0;
 
     /* Callbacks*/
     private GLFWKeyCallback keyCallback;
@@ -331,15 +332,19 @@ public class GameGUI {
 
             game.do_move(mi);
         }
-
-        if (game.getState() == GameState.NEXT_LEVEL) {
+        
+        
+                    
+        if (game.getState() == GameState.NEXT_LEVEL && game.getLevel() < 100) {
             game.next_level();
+
             double random = Math.random();
             if (random < 0.5) {
                 ROTATION_ORIENTATION = -ROTATION_ORIENTATION;
             }
         }
-
+        if(game.getLevel() > Mscore)
+                Mscore = game.getLevel();
         if (game.getState() == GameState.PLAYING) {
 //            if (game.getCooldown().running) {
 //                rotate += ROTATION_ORIENTATION * ROTATION_BASE_INCREMENT;
@@ -444,10 +449,12 @@ public class GameGUI {
     }
 
     private void drawHome() {
-        Text.drawString("Touch", -2f, 3, 0.7f, 2f);
-        Text.drawString("s  to  start", -3f, -1f, 0.5f, 2f);
-        Text.drawString("c  to  controls", -3f, -3f, 0.5f, 2f);
-        Text.drawString("a  to  about", -3f, -5f, 0.5f, 2f);
+        Text.drawString("Touch", -2f, 4, 0.7f, 2f);
+        Text.drawString("s  to  start", -3f, 1f, 0.5f, 2f);
+        Text.drawString("c  to  controls", -3f, -1f, 0.5f, 2f);
+        Text.drawString("a  to  about", -3f, -3f, 0.5f, 2f);
+        Text.drawString("Best score: ", -6f, -6f, 0.5f, 2.1f);
+        Text.drawString(Integer.toString(Mscore), 3, -6f, 0.5f, 2.1f);
     }
 
     private void drawInstructions1() {
