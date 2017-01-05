@@ -114,9 +114,12 @@ public class GameGUI {
                 switch (key) {
                     case GLFW_KEY_N:
                         if (game.getState() == GameState.PLAYING && action == GLFW_RELEASE) {
-                            game.next_level();
+                            if (game.getLevel() < 100) {
+                                game.next_level();
+                            }
                         }
                         break;
+
                     case GLFW_KEY_R:
                         if (game.getState() == GameState.PLAYING && action == GLFW_RELEASE) {
                             game.reset_level();
@@ -332,9 +335,7 @@ public class GameGUI {
 
             game.do_move(mi);
         }
-        
-        
-                    
+
         if (game.getState() == GameState.NEXT_LEVEL && game.getLevel() < 100) {
             game.next_level();
 
@@ -343,8 +344,9 @@ public class GameGUI {
                 ROTATION_ORIENTATION = -ROTATION_ORIENTATION;
             }
         }
-        if(game.getLevel() > Mscore)
-                Mscore = game.getLevel();
+        if (game.getLevel() > Mscore) {
+            Mscore = game.getLevel();
+        }
         if (game.getState() == GameState.PLAYING) {
 //            if (game.getCooldown().running) {
 //                rotate += ROTATION_ORIENTATION * ROTATION_BASE_INCREMENT;

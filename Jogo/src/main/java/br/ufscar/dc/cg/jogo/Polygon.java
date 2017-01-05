@@ -77,10 +77,10 @@ public class Polygon {
                 tries_left--;
 
             } while (p.min_distance(poly._poly) < 0.1 || angle_pair.getFirst() < 0.35 || poly.is_inside(p)/* || angle_pair.getSecond() > 2.7*/);
-            System.out.println("angle: " + angle_pair);
+//            System.out.println("angle: " + angle_pair);
             poly.add(p);
         }
-        System.out.println();
+//        System.out.println();
 
         Polygon new_poly = new Polygon();
         for (Point p : ConvexHull2D.calculateHull(poly._poly)) {

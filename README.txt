@@ -4,6 +4,4 @@ Alunos:
 Antonio Carlos Falcão Petri – 586692
 Thiago Yonamine – 587001
 
-para executar o jogo abra o terminal e digite:
-java -jar Jogo-0-jar-with-dependencies.jar
 
